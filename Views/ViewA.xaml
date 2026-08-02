@@ -1,0 +1,68 @@
+﻿<UserControl x:Class="ToolCollisionCalibration.Views.ViewA"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:prism="http://prismlibrary.com/"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:chart="clr-namespace:ToolCollisionCalibration.Normal"
+             xmlns:local="clr-namespace:ToolCollisionCalibration.Views"
+             mc:Ignorable="d"
+             d:DesignHeight="650" d:DesignWidth="1000">
+    <Grid>
+        <Border Background="Aquamarine">
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="*"/>
+                    <RowDefinition Height="100"/>
+                    <RowDefinition Height="100"/>
+                </Grid.RowDefinitions>
+                <Label Content="角度与扭矩笛卡尔坐标" HorizontalAlignment="Center"/>
+                <chart:ChartCanvas Grid.Row="1"
+                           Points="{Binding Points, Mode=OneWay}"
+                           XMin="{Binding XMin, Mode=OneWay}"
+                           XMax="{Binding XMax, Mode=OneWay}"
+                           YMin="{Binding YMin, Mode=OneWay}"
+                           YMax="{Binding YMax, Mode=OneWay}"
+                           XAxisTitle="扭矩"
+                           YAxisTitle="角度"
+                           Background="White"
+                           Margin="10,6,10,6"/>
+                <DataGrid Grid.Row="3" x:Name="LogDataGrid" IsReadOnly="True" AutoGenerateColumns="False" CanUserAddRows="False" CanUserSortColumns="False" FontSize="20">
+                    <DataGrid.Columns>
+                        <DataGridTextColumn Header="时间" Binding="{Binding Time}"/>
+                        <DataGridTextColumn Header="类型">
+                            <DataGridTextColumn.CellStyle>
+                                <Style TargetType="{x:Type DataGridCell}">
+                                    <Setter Property="Template">
+                                        <Setter.Value>
+                                            <ControlTemplate TargetType="{x:Type DataGridCell}">
+                                                <Border x:Name="Boder">
+                                                    <TextBlock Text="{Binding LogType}" VerticalAlignment="Center" HorizontalAlignment="Center"/>
+                                                </Border>
+                                                <ControlTemplate.Triggers>
+                                                    <DataTrigger Binding="{Binding LogType}" Value="消息">
+                                                        <Setter TargetName="Boder" Property="Background" Value="Green"/>
+                                                    </DataTrigger>
+                                                    <DataTrigger  Binding="{Binding LogType}" Value="提示">
+                                                        <Setter TargetName="Boder" Property="Background" Value="Yellow"/>
+                                                    </DataTrigger>
+                                                    <DataTrigger Binding="{Binding LogType}" Value="错误">
+                                                        <Setter TargetName="Boder" Property="Background" Value="Red"/>
+                                                    </DataTrigger>
+                                                </ControlTemplate.Triggers>
+                                            </ControlTemplate>
+                                        </Setter.Value>
+                                    </Setter>
+                                </Style>
+                            </DataGridTextColumn.CellStyle>
+                        </DataGridTextColumn>
+                        <DataGridTextColumn Header="信息" Binding="{Binding Message}" Width="Auto"/>
+                    </DataGrid.Columns>
+                </DataGrid>
+
+            </Grid>
+        </Border>
+    </Grid>
+    
+</UserControl>

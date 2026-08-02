@@ -1,0 +1,16 @@
+﻿<UserControl x:Class="ToolCollisionCalibration.Views.ViewB"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:ToolCollisionCalibration.Views"
+             xmlns:usercontrol="clr-namespace:WPFLibrary.Controls.UserControls;assembly=WPFLibrary" 
+             xmlns:customcontrol="clr-namespace:WPFLibrary.Controls.CustomControls;assembly=WPFLibrary"
+             xmlns:i="http://schemas.microsoft.com/xaml/behaviors"
+             xmlns:prism="http://prismlibrary.com/"
+             mc:Ignorable="d" 
+             d:DesignHeight="650" d:DesignWidth="1000">
+    <Grid>
+        
+    </Grid>
+</UserControl>

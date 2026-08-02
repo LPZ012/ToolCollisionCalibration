@@ -1,0 +1,73 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <TargetFramework>net8.0-windows7.0</TargetFramework>
+    <Nullable>disable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <UseWPF>true</UseWPF>
+    <ApplicationIcon>纸飞机_128x128.ico</ApplicationIcon>
+    <Platforms>AnyCPU;x64</Platforms>
+    <AssemblyVersion>2026.7.30.36</AssemblyVersion>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Compile Remove="新文件夹1\**" />
+    <Compile Remove="新文件夹\**" />
+    <EmbeddedResource Remove="新文件夹1\**" />
+    <EmbeddedResource Remove="新文件夹\**" />
+    <None Remove="新文件夹1\**" />
+    <None Remove="新文件夹\**" />
+    <Page Remove="新文件夹1\**" />
+    <Page Remove="新文件夹\**" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Remove="ImageResources\主页.png" />
+    <None Remove="ImageResources\二维码.png" />
+    <None Remove="ImageResources\信号.png" />
+    <None Remove="ImageResources\扫码枪.png" />
+    <None Remove="ImageResources\操作.png" />
+    <None Remove="ImageResources\数据.png" />
+    <None Remove="ImageResources\数据库.png" />
+    <None Remove="ImageResources\无信号.png" />
+    <None Remove="ImageResources\点击.png" />
+    <None Remove="ImageResources\设置.png" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Content Include="纸飞机_128x128.ico" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="CsvHelper" Version="33.1.0" />
+    <PackageReference Include="Dapper" Version="2.1.66" />
+    <PackageReference Include="MaterialDesignThemes" Version="5.2.1" />
+    <PackageReference Include="Microsoft.Data.SqlClient" Version="6.1.2" />
+    <PackageReference Include="Newtonsoft.Json" Version="13.0.4" />
+    <PackageReference Include="Prism.DryIoc" Version="9.0.537" />
+    <PackageReference Include="PropertyChanged.Fody" Version="4.1.0" />
+    <PackageReference Include="System.IO.Ports" Version="9.0.10" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Resource Include="ImageResources\主页.png" />
+    <Resource Include="ImageResources\二维码.png" />
+    <Resource Include="ImageResources\信号.png" />
+    <Resource Include="ImageResources\操作.png" />
+    <Resource Include="ImageResources\数据.png" />
+    <Resource Include="ImageResources\点击.png" />
+    <Resource Include="ImageResources\飞机.png" />
+    <Resource Include="ImageResources\扫码枪.png" />
+    <Resource Include="ImageResources\数据库.png">
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="ImageResources\无信号.png" />
+    <Resource Include="ImageResources\设置.png" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="DLL\" />
+  </ItemGroup>
+
+</Project>
