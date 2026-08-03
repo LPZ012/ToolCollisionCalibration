@@ -8,7 +8,7 @@
     <UseWPF>true</UseWPF>
     <ApplicationIcon>纸飞机_128x128.ico</ApplicationIcon>
     <Platforms>AnyCPU;x64</Platforms>
-    <AssemblyVersion>2026.7.30.36</AssemblyVersion>
+    <AssemblyVersion>2026.8.3.54</AssemblyVersion>
   </PropertyGroup>
 
   <ItemGroup>
@@ -68,6 +68,10 @@
 
   <ItemGroup>
     <Folder Include="DLL\" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\WPFLibrary\WPFLibrary.csproj" />
   </ItemGroup>
 
 </Project>

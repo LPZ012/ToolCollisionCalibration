@@ -55,12 +55,12 @@
                         <TextBlock Text="设置" Margin="10,0"/>
                     </StackPanel>
                 </Button>
-                <!--<Button Style="{StaticResource TitleButtonStyle}" Command="{Binding NavigateCommand}" CommandParameter="ViewC" Height="Auto" Margin="0,30">
+                <Button Style="{StaticResource TitleButtonStyle}" Command="{Binding NavigateCommand}" CommandParameter="ViewC" Height="Auto">
                     <StackPanel Orientation="Horizontal">
-                        <Image Source="/ImageResources/设置.png" Width="33" Height="33"/>
-                        <TextBlock Text="C" Margin="10,0"/>
+                        <Image Source="/ImageResources/操作.png" Width="33" Height="33"/>
+                        <TextBlock Text="调试" Margin="10,0"/>
                     </StackPanel>
-                </Button>-->
+                </Button>
             </StackPanel>
         </materialDesign:DrawerHost.LeftDrawerContent>
         <Grid>

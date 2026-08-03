@@ -24,36 +24,35 @@ namespace ToolCollisionCalibration.Models
         public float Mpos { get; set; }
 
         public float Speed { get; set; }
-
-        public int Status
-        {
-            get => _status;
-            set { _status = value; OnPropertyChanged(); OnPropertyChanged(nameof(StatusText)); OnPropertyChanged(nameof(StatusColor)); }
-        }
+        /// <summary>
+        /// 运动状态，0表示运动中，1表示停止
+        /// </summary>
+        public int Status { get; set; }
 
         public string StatusText => Status == 0 ? "运动中" : "停止";
 
         public Brush StatusColor => Status == 0 ? Brushes.Red : Brushes.Green;
 
-        public uint HomeStatus
-        {
-            get => _homeStatus;
-            set { _homeStatus = value; OnPropertyChanged(); OnPropertyChanged(nameof(HomeStatusText)); }
-        }
+        public uint HomeStatus { get; set; }
 
         public string HomeStatusText => HomeStatus == 1 ? "已回零" : "未回零";
 
-        public AxisParamModel Param
-        {
-            get => _param;
-            set { _param = value; OnPropertyChanged(); }
-        }
+        public AxisParamModel Param { get; set; }
 
 
         public event PropertyChangedEventHandler PropertyChanged;
         protected void OnPropertyChanged(string propertyName)
         {
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+            if (propertyName == nameof(Status))
+            {
+                PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(StatusText)));
+                PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(StatusColor)));
+            } 
+            if(propertyName == nameof(HomeStatus))
+            {
+                PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(HomeStatusText)));
+            }
         }
     }
 
