@@ -5,6 +5,7 @@ using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Windows;
 using ToolCollisionCalibration.Models;
+using WPFLibrary.Logger;
 using WPFLibrary.Zmotion;
 
 namespace ToolCollisionCalibration.ViewModels
@@ -35,17 +36,25 @@ namespace ToolCollisionCalibration.ViewModels
                         Sramp = 0
                     }
                 });
-                JogPosMoveCommand = new DelegateCommand(OnJogPosMove);
+                
             }
-
+            JogPosMoveCommand = new DelegateCommand<object>(OnJogPosMove);
         }
 
         public ObservableCollection<AxisItem> AxisItems { get; set; } = new ObservableCollection<AxisItem>();
-        public DelegateCommand JogPosMoveCommand { get; }
+        public DelegateCommand<object> JogPosMoveCommand { get; }
+        private readonly IPulseADIOControler PulseADIOControler;
+        private readonly ILoggers Log;
 
-        private void OnJogPosMove()
+        private void OnJogPosMove(object AxisNumber)
         {
-           MessageBox.Show("正向点动移动命令已触发！");
+            int axisNumber = Convert.ToInt32(AxisNumber);
+            var axisparam = AxisItems[axisNumber].Param;
+            var result = PulseADIOControler?.ZAux_Direct_Single_Vmove(axisNumber, axisparam, 1);
+            if(!result.IsSuccess)
+            {
+                Log.Write(result.ErrMessage, LogType.错误);
+            }
         }
 
 

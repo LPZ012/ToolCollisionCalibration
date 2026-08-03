@@ -6,7 +6,6 @@
              xmlns:i="http://schemas.microsoft.com/xaml/behaviors"
              xmlns:prism="http://prismlibrary.com/"
              xmlns:local="clr-namespace:ToolCollisionCalibration.Views"
-             x:Name="ViewCUserControl"
              mc:Ignorable="d" 
              d:DesignHeight="650" d:DesignWidth="1000">
     <UserControl.Resources>
@@ -129,8 +128,8 @@
 
                                 <Button Grid.Column="6" Content="+" Width="50" Height="28">
                                     <i:Interaction.Triggers>
-                                        <i:EventTrigger EventName="MouseLeftButtonDown">
-                                            <prism:InvokeCommandAction Command="{Binding JogPosMoveCommand,ElementName=ViewCUserControl}"/>
+                                        <i:EventTrigger EventName="PreviewMouseDown">
+                                            <prism:InvokeCommandAction Command="{Binding DataContext.JogPosMoveCommand, RelativeSource={RelativeSource AncestorType=UserControl}}" CommandParameter="{Binding AxisNumber}"/>
                                         </i:EventTrigger>
                                     </i:Interaction.Triggers>
                                 </Button>
