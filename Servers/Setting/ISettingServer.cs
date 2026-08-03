@@ -5,6 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using ToolCollisionCalibration.Devices;
+using System.Collections.ObjectModel;
 
 namespace ToolCollisionCalibration.Servers.Setting
 {
@@ -12,6 +13,7 @@ namespace ToolCollisionCalibration.Servers.Setting
     {
 
         SettingModel settingModel { get; set; }
+
         bool LoadSettingAsync();
         bool WriteSetting();
         bool GetParamsFromDB();

@@ -27,7 +27,7 @@ namespace ToolCollisionCalibration.ViewModels
 
         }
         ///////////////////////////////设备/////////////////////////////////////////
-        IPulseADIOControler PulseADIOControler => _IsettingServer.IPulseADIOControler;
+        IPulseADIOControler PulseADIOControler => _IsettingServer.motionCard;
         IScanner<byte[]> Scanner => _IsettingServer.Scanner;
         //////////////////////////////////////////////////////////////////////////
         DBParams dBParams => _IsettingServer.settingModel.DBParams;
@@ -89,7 +89,7 @@ namespace ToolCollisionCalibration.ViewModels
             {
                 for (int i = 0; i < 15; i++)
                 {
-                    _IsettingServer.IPulseADIOControler.ZAux_Direct_GetIn(i, ref inputStatus[i]);
+                    _IsettingServer.motionCard.ZAux_Direct_GetIn(i, ref inputStatus[i]);
                 }
                 //停止
                 if (inputStatus[0] == 0)

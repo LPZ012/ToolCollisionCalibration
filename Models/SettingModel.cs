@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Linq;
 using System.Text;
@@ -17,21 +18,8 @@ namespace ToolCollisionCalibration.Models
         /// 本地参数模型
         /// </summary>
         public LocalParams localparams { get; set; } = new LocalParams();
-        /// <summary>
-        /// 默认模型
-        /// </summary>
-        public List<ItemsModel> DefaultItemsModels { get; set; } = [];
-        public List<ItemsModel> LeftSelectItemModel { get; set; } = [];
-        public List<ItemsModel> RightSelectItemModel { get; set; } = [];
-        /// <summary>
-        /// 左侧ES30X模型
-        /// </summary>
-        public List<ItemsModel> LeftES3XXItemsModels { get; set; } = [];
-        /// <summary>
-        /// 右侧ES30X模型
-        /// </summary>
-        public List<ItemsModel> RightES3XXItemsModels { get; set; } = [];
         public DBParams DBParams { get; set; } = new DBParams();
+        public ObservableCollection<AxisItem> AxisItems { get; set; } = new ObservableCollection<AxisItem>();
         public event PropertyChangedEventHandler PropertyChanged;
         protected void OnPropertyChanged(string propertyName)
         {

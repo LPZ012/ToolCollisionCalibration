@@ -73,7 +73,6 @@
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="*"/>
-            <RowDefinition Height="150"/>
         </Grid.RowDefinitions>
         <Grid Grid.Row="0" Margin="0,0,0,10">
             <Grid.ColumnDefinitions>
@@ -102,7 +101,7 @@
 
         <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Auto">
             <StackPanel>
-                <ItemsControl ItemsSource="{Binding AxisItems}">
+                <ItemsControl ItemsSource="{Binding settingServer.settingModel.AxisItems}">
                     <ItemsControl.ItemTemplate>
                         <DataTemplate>
                             <Grid Margin="0,3,0,3">
@@ -129,13 +128,29 @@
                                 <Button Grid.Column="6" Content="+" Width="50" Height="28">
                                     <i:Interaction.Triggers>
                                         <i:EventTrigger EventName="PreviewMouseDown">
-                                            <prism:InvokeCommandAction Command="{Binding DataContext.JogPosMoveCommand, RelativeSource={RelativeSource AncestorType=UserControl}}" CommandParameter="{Binding AxisNumber}"/>
+                                            <prism:InvokeCommandAction Command="{Binding DataContext.JogForwardMoveCommand, RelativeSource={RelativeSource AncestorType=UserControl}}" CommandParameter="{Binding AxisNumber}"/>
                                         </i:EventTrigger>
+                                        <i:EventTrigger EventName="PreviewMouseUp">
+                                            <prism:InvokeCommandAction Command="{Binding DataContext.AxisStopCommand, RelativeSource={RelativeSource AncestorType=UserControl}}" CommandParameter="{Binding AxisNumber}"/>
+                                        </i:EventTrigger>
+
                                     </i:Interaction.Triggers>
                                 </Button>
-                                <Button Grid.Column="7" Content="-" Width="50" Height="28"/>
-                                <Button Grid.Column="8" Content="停止" Width="50" Height="28"/>
-                                <Button Grid.Column="9" Content="回零" Width="50" Height="28"/>
+                                <Button Grid.Column="7" Content="-" Width="50" Height="28">
+                                    <i:Interaction.Triggers>
+                                        <i:EventTrigger EventName="PreviewMouseDown">
+                                            <prism:InvokeCommandAction Command="{Binding DataContext.JogReverseMoveCommand, RelativeSource={RelativeSource AncestorType=UserControl}}" CommandParameter="{Binding AxisNumber}"/>
+                                        </i:EventTrigger>
+                                        <i:EventTrigger EventName="PreviewMouseUp">
+                                            <prism:InvokeCommandAction Command="{Binding DataContext.AxisStopCommand, RelativeSource={RelativeSource AncestorType=UserControl}}" CommandParameter="{Binding AxisNumber}"/>
+                                        </i:EventTrigger>
+                                        <i:EventTrigger EventName="PreviewMouseUp">
+    <prism:InvokeCommandAction Command="{Binding DataContext.AxisStopCommand, RelativeSource={RelativeSource AncestorType=UserControl}}" CommandParameter="{Binding AxisNumber}"/>
+</i:EventTrigger>
+                                    </i:Interaction.Triggers>
+                                </Button> 
+                                <Button Grid.Column="8" Content="停止" Command="{Binding DataContext.AxisStopCommand, RelativeSource={RelativeSource AncestorType=UserControl}}" CommandParameter="{Binding AxisNumber}" Width="50" Height="28"/>
+                                <Button Grid.Column="9" Content="回零" Command="{Binding DataContext.ReturnOriginalCommand, RelativeSource={RelativeSource AncestorType=UserControl}}" CommandParameter="{Binding AxisNumber}" Width="50" Height="28"/>
                             </Grid>
                         </DataTemplate>
                     </ItemsControl.ItemTemplate>
@@ -145,7 +160,7 @@
 
                 <TextBlock Text="轴参数设置" FontSize="14" FontWeight="Bold" Margin="0,10,0,5"/>
 
-                <ItemsControl ItemsSource="{Binding AxisItems}">
+                <ItemsControl ItemsSource="{Binding settingServer.settingModel.AxisItems}">
                     <ItemsControl.ItemTemplate>
                         <DataTemplate>
                             <Border Margin="0,3,0,3" BorderBrush="Gray" BorderThickness="1" Padding="8">
