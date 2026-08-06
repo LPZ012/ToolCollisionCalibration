@@ -81,7 +81,6 @@
                 <ColumnDefinition Width="120"/>
                 <ColumnDefinition Width="120"/>
                 <ColumnDefinition Width="100"/>
-                <ColumnDefinition Width="100"/>
                 <ColumnDefinition Width="80"/>
                 <ColumnDefinition Width="80"/>
                 <ColumnDefinition Width="80"/>
@@ -92,11 +91,10 @@
             <TextBlock Grid.Column="2" Text="反馈位置" FontWeight="Bold" HorizontalAlignment="Center"/>
             <TextBlock Grid.Column="3" Text="规划速度" FontWeight="Bold" HorizontalAlignment="Center"/>
             <TextBlock Grid.Column="4" Text="运动状态" FontWeight="Bold" HorizontalAlignment="Center"/>
-            <TextBlock Grid.Column="5" Text="回零状态" FontWeight="Bold" HorizontalAlignment="Center"/>
-            <TextBlock Grid.Column="6" Text="正向点动" FontWeight="Bold" HorizontalAlignment="Center"/>
-            <TextBlock Grid.Column="7" Text="反向点动" FontWeight="Bold" HorizontalAlignment="Center"/>
-            <TextBlock Grid.Column="8" Text="停止" FontWeight="Bold" HorizontalAlignment="Center"/>
-            <TextBlock Grid.Column="9" Text="回零" FontWeight="Bold" HorizontalAlignment="Center"/>
+            <TextBlock Grid.Column="5" Text="正向点动" FontWeight="Bold" HorizontalAlignment="Center"/>
+            <TextBlock Grid.Column="6" Text="反向点动" FontWeight="Bold" HorizontalAlignment="Center"/>
+            <TextBlock Grid.Column="7" Text="停止" FontWeight="Bold" HorizontalAlignment="Center"/>
+            <TextBlock Grid.Column="8" Text="回零" FontWeight="Bold" HorizontalAlignment="Center"/>
         </Grid>
 
         <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Auto">
@@ -111,7 +109,6 @@
                                     <ColumnDefinition Width="120"/>
                                     <ColumnDefinition Width="120"/>
                                     <ColumnDefinition Width="100"/>
-                                    <ColumnDefinition Width="100"/>
                                     <ColumnDefinition Width="80"/>
                                     <ColumnDefinition Width="80"/>
                                     <ColumnDefinition Width="80"/>
@@ -123,9 +120,7 @@
                                 <TextBlock Grid.Column="2" Text="{Binding Mpos, StringFormat=F2}" HorizontalAlignment="Center" VerticalAlignment="Center"/>
                                 <TextBlock Grid.Column="3" Text="{Binding Speed, StringFormat=F2}" HorizontalAlignment="Center" VerticalAlignment="Center"/>
                                 <TextBlock Grid.Column="4" Text="{Binding StatusText}" HorizontalAlignment="Center" VerticalAlignment="Center" Foreground="{Binding StatusColor}"/>
-                                <TextBlock Grid.Column="5" Text="{Binding HomeStatusText}" HorizontalAlignment="Center" VerticalAlignment="Center"/>
-
-                                <Button Grid.Column="6" Content="+" Width="50" Height="28">
+                                <Button Grid.Column="5" Content="+" Width="50" Height="28">
                                     <i:Interaction.Triggers>
                                         <i:EventTrigger EventName="PreviewMouseDown">
                                             <prism:InvokeCommandAction Command="{Binding DataContext.JogForwardMoveCommand, RelativeSource={RelativeSource AncestorType=UserControl}}" CommandParameter="{Binding AxisNumber}"/>
@@ -136,7 +131,7 @@
 
                                     </i:Interaction.Triggers>
                                 </Button>
-                                <Button Grid.Column="7" Content="-" Width="50" Height="28">
+                                <Button Grid.Column="6" Content="-" Width="50" Height="28">
                                     <i:Interaction.Triggers>
                                         <i:EventTrigger EventName="PreviewMouseDown">
                                             <prism:InvokeCommandAction Command="{Binding DataContext.JogReverseMoveCommand, RelativeSource={RelativeSource AncestorType=UserControl}}" CommandParameter="{Binding AxisNumber}"/>
@@ -149,8 +144,8 @@
 </i:EventTrigger>
                                     </i:Interaction.Triggers>
                                 </Button> 
-                                <Button Grid.Column="8" Content="停止" Command="{Binding DataContext.AxisStopCommand, RelativeSource={RelativeSource AncestorType=UserControl}}" CommandParameter="{Binding AxisNumber}" Width="50" Height="28"/>
-                                <Button Grid.Column="9" Content="回零" Command="{Binding DataContext.ReturnOriginalCommand, RelativeSource={RelativeSource AncestorType=UserControl}}" CommandParameter="{Binding AxisNumber}" Width="50" Height="28"/>
+                                <Button Grid.Column="7" Content="停止" Command="{Binding DataContext.AxisStopCommand, RelativeSource={RelativeSource AncestorType=UserControl}}" CommandParameter="{Binding AxisNumber}" Width="50" Height="28"/>
+                                <Button Grid.Column="8" Content="回零" Command="{Binding DataContext.ReturnOriginalCommand, RelativeSource={RelativeSource AncestorType=UserControl}}" CommandParameter="{Binding AxisNumber}" Width="50" Height="28"/>
                             </Grid>
                         </DataTemplate>
                     </ItemsControl.ItemTemplate>
@@ -160,7 +155,7 @@
 
                 <TextBlock Text="轴参数设置" FontSize="14" FontWeight="Bold" Margin="0,10,0,5"/>
 
-                <ItemsControl ItemsSource="{Binding settingServer.settingModel.AxisItems}">
+                <ItemsControl ItemsSource="{Binding settingServer.settingModel.AxisItems}" IsEnabled="False">
                     <ItemsControl.ItemTemplate>
                         <DataTemplate>
                             <Border Margin="0,3,0,3" BorderBrush="Gray" BorderThickness="1" Padding="8">
@@ -216,33 +211,31 @@
                 </ItemsControl>
 
                 <!-- 位置设定 -->
-                <GroupBox Header="位置设定" FontSize="14" FontWeight="Bold" Margin="0,15,0,5" Padding="10">
+                <GroupBox Header="位置标定与绝对运动" FontSize="14" FontWeight="Bold" Margin="0,15,0,5" Padding="10">
                     <Grid>
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="Auto"/>
-                            <ColumnDefinition Width="*"/>
-                            <ColumnDefinition Width="Auto"/>
-                            <ColumnDefinition Width="*"/>
-                        </Grid.ColumnDefinitions>
                         <Grid.RowDefinitions>
                             <RowDefinition Height="Auto"/>
                             <RowDefinition Height="Auto"/>
                         </Grid.RowDefinitions>
+                        <StackPanel Grid.Row="0" Orientation="Horizontal">
+                            <Button Grid.Row="0" Command="{Binding SetPositionCommand}" CommandParameter="X_TakePinPositionCommand" Content="X轴取销钉位置标定" Width="130" Height="35" Style="{StaticResource CalButtonStyle}"/>
+                            <TextBlock Text="{Binding settingServer.settingModel.localparams.X_TakePinPosition}" FontSize="13" VerticalAlignment="Center" Margin="10,0,40,0"/>
+                            <Button Command="{Binding SetPositionCommand}" CommandParameter="Y_TakePinPositionCommand" Content="Y轴取销钉位置标定" Width="130" Height="35" Style="{StaticResource CalButtonStyle}"/>
+                            <TextBlock Text="{Binding settingServer.settingModel.localparams.Y_TakePinPosition}" FontSize="13" VerticalAlignment="Center" Margin="10,0,150,0"/>
+                            <Button Grid.Column="2" Command="{Binding AbsMoveCommand}" CommandParameter="X_AbsMoveCommand" Content="X轴绝对运动" Width="130" Height="35" Style="{StaticResource CalButtonStyle}"/>
+                            <TextBox IsEnabled="False" Text="{Binding X_AbsMovePostion}" FontSize="13" VerticalAlignment="Center" TextAlignment="Center" Width="100" Margin="10,0,40,0"/>
+                        </StackPanel>
+                        <StackPanel Grid.Row="1" Orientation="Horizontal" Margin="0,5,0,0">
+                            <Button Command="{Binding SetPositionCommand}" CommandParameter="X_PinPositionCommand" Content="X轴打销钉位置标定" Width="130" Height="35" Style="{StaticResource CalButtonStyle}"/>
+                            <TextBlock Text="{Binding settingServer.settingModel.localparams.Y_TakePinPosition}" FontSize="13" VerticalAlignment="Center" Margin="10,0,40,0"/>
+                            <Button Command="{Binding SetPositionCommand}" CommandParameter="Y_PinPositionCommand" Content="Y轴打销钉位置标定" Width="130" Height="35" Style="{StaticResource CalButtonStyle}"/>
+                            <TextBlock Text="{Binding settingServer.settingModel.localparams.Y_PinPosition}" FontSize="13" VerticalAlignment="Center" Margin="10,0,150,0"/>
+                            <Button Command="{Binding AbsMoveCommand}" CommandParameter="Y_AbsMoveCommand" Content="Y轴绝对运动" Width="130" Height="35" Style="{StaticResource CalButtonStyle}"/>
+                            <TextBox Text="{Binding Y_AbsMovePostion}" FontSize="13" VerticalAlignment="Center" TextAlignment="Center" Width="100" Margin="10,0,40,0"/>
 
-                        <Button Grid.Column="0" Grid.Row="0" Content="标定取销钉位置" Width="110" Height="35" Style="{StaticResource CalButtonStyle}" Margin="0,0,5,5"/>
-                        <TextBlock Grid.Column="1" Grid.Row="0" Text="{Binding CalPickPosText}" FontFamily="Consolas" FontSize="13" VerticalAlignment="Center" Margin="0,0,0,5"/>
-
-                        <Button Grid.Column="2" Grid.Row="0" Content="标定打销钉位置" Width="110" Height="35" Style="{StaticResource CalButtonStyle}"/>
-                        <TextBlock Grid.Column="3" Grid.Row="0" Text="{Binding CalDrivePosText}" FontFamily="Consolas" FontSize="13" VerticalAlignment="Center" Margin="0,0,0,5"/>
-
-                        <Button Grid.Column="0" Grid.Row="1" Content="标定旋转位置" Width="110" Height="35" Style="{StaticResource CalButtonStyle}" Margin="0,0,5,0"/>
-                        <TextBlock Grid.Column="1" Grid.Row="1" Text="{Binding CalRotatePosText}" FontFamily="Consolas" FontSize="13" VerticalAlignment="Center"/>
-
-                        <Button Grid.Column="2" Grid.Row="1" Content="标定回来位置" Width="110" Height="35" Style="{StaticResource CalButtonStyle}" Margin="5,0,0,0"/>
-                        <TextBlock Grid.Column="3" Grid.Row="1" Text="{Binding CalReturnPosText}" FontFamily="Consolas" FontSize="13" VerticalAlignment="Center"/>
+                        </StackPanel>
                     </Grid>
                 </GroupBox>
-
                 <!-- IO控制 -->
                 <GroupBox Header="IO控制" FontSize="14" FontWeight="Bold" Margin="0,15,0,5" Padding="10">
                     <ItemsControl>
@@ -251,14 +244,14 @@
                                 <UniformGrid Columns="4"/>
                             </ItemsPanelTemplate>
                         </ItemsControl.ItemsPanel>
-                        <Button Content="输出1" Height="36" Margin="5" Style="{StaticResource IOButtonStyle}"/>
-                        <Button Content="输出2" Height="36" Margin="5" Style="{StaticResource IOButtonStyle}"/>
-                        <Button Content="输出3" Height="36" Margin="5" Style="{StaticResource IOButtonStyle}"/>
-                        <Button Content="输出4" Height="36" Margin="5" Style="{StaticResource IOButtonStyle}"/>
-                        <Button Content="输出5" Height="36" Margin="5" Style="{StaticResource IOButtonStyle}"/>
-                        <Button Content="输出6" Height="36" Margin="5" Style="{StaticResource IOButtonStyle}"/>
-                        <Button Content="输出7" Height="36" Margin="5" Style="{StaticResource IOButtonStyle}"/>
-                        <Button Content="输出8" Height="36" Margin="5" Style="{StaticResource IOButtonStyle}"/>
+                        <Button Content="销钉气缸缩回" Height="36" Margin="5" Style="{StaticResource IOButtonStyle}"/>
+                        <Button Content="销钉气缸伸出" Height="36" Margin="5" Style="{StaticResource IOButtonStyle}"/>
+                        <Button Content="定位气缸伸出" Height="36" Margin="5" Style="{StaticResource IOButtonStyle}"/>
+                        <Button Content="定位气缸缩回" Height="36" Margin="5" Style="{StaticResource IOButtonStyle}"/>
+                        <Button Content="备用" Height="36" Margin="5" Style="{StaticResource IOButtonStyle}"/>
+                        <Button Content="备用" Height="36" Margin="5" Style="{StaticResource IOButtonStyle}"/>
+                        <Button Content="备用" Height="36" Margin="5" Style="{StaticResource IOButtonStyle}"/>
+                        <Button Content="备用" Height="36" Margin="5" Style="{StaticResource IOButtonStyle}"/>
                     </ItemsControl>
                 </GroupBox>
             </StackPanel>

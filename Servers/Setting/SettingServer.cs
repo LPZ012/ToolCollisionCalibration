@@ -60,7 +60,6 @@ namespace ToolCollisionCalibration.Servers.Setting
                     Mpos = 0,
                     Speed = 0,
                     Status = -1,
-                    HomeStatus = 0,
                     Param = settingModel.localparams.AxisParamModels[i]
                 });
             }

@@ -5,6 +5,7 @@ using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Threading;
+using ToolCollisionCalibration.Devices;
 using ToolCollisionCalibration.Models;
 using ToolCollisionCalibration.Servers.Message.ViewBToViewA;
 using ToolCollisionCalibration.Servers.Setting;
@@ -27,23 +28,20 @@ namespace ToolCollisionCalibration.ViewModels
 
         }
         ///////////////////////////////设备/////////////////////////////////////////
-        IPulseADIOControler PulseADIOControler => _IsettingServer.motionCard;
+        MotionCard motionCard => _IsettingServer.motionCard;
         IScanner<byte[]> Scanner => _IsettingServer.Scanner;
         //////////////////////////////////////////////////////////////////////////
         DBParams dBParams => _IsettingServer.settingModel.DBParams;
         public DeviceValueModel deviceValueModel { get; set; } = new DeviceValueModel();
         
         public SettingModel settingModel => _IsettingServer.settingModel;
-        /// <summary>
-        /// 运行状态
-        /// </summary>
-        public bool LeftIsRunning { get; set; } = false;
-        public bool RightIsRunning { get; set; } = false;
+        
         /// <summary>
         /// 测试结果
         /// </summary>
-        public string LeftTestResult { get; set; }
-        public string RightTestResult { get; set; }
+        public string TestResult { get; set; }
+
+
         
         public ISettingServer _IsettingServer { get; set; }
         /// <summary>
@@ -54,15 +52,14 @@ namespace ToolCollisionCalibration.ViewModels
         public event PropertyChangedEventHandler PropertyChanged;
         private DispatcherTimer _refreshTimer;
         private CancellationTokenSource cts = new CancellationTokenSource();
-        private List<uint> ListOldSinal = new List<uint>(new uint[15]);
+        private uint[] ListOldSinal = new uint[32];
         /// <summary>
         /// 输入口的各个点位状态
         /// </summary>
-		private uint[] inputStatus = new uint[15];
+		private uint[] inputStatus = new uint[32];
 		public DataBaseModel dataBaseModel { get; set; } = new DataBaseModel();
         private DateTime StartTime;
-        public double LeftTestTime { get; set;  }
-        public double RightTestTime { get; set; }
+        public double TestTime { get; set;  }
 
         private ViewBToViewAModel viewBToViewA = new ViewBToViewAModel();
 
@@ -87,10 +84,20 @@ namespace ToolCollisionCalibration.ViewModels
         {
             try
             {
-                for (int i = 0; i < 15; i++)
+                int[] IdleStatus = new int[4]; float[] DposStatus = new float[4]; float[] MposStatus = new float[4];  int[] AxisStatus = new int[4];
+                for (int i = 0; i < 32; i++)
                 {
-                    _IsettingServer.motionCard.ZAux_Direct_GetIn(i, ref inputStatus[i]);
+                    motionCard.ZAux_Direct_GetIn(i, ref inputStatus[i]);
                 }
+                motionCard.ZAux_Direct_GetAllAxisInfo(4, IdleStatus, DposStatus, MposStatus, AxisStatus);
+                for (int i = 0; i < 4; i++)
+                {
+                    _IsettingServer.settingModel.AxisItems[i].IdleStatus = IdleStatus[i];
+                    _IsettingServer.settingModel.AxisItems[i].Dpos = DposStatus[i];
+                    _IsettingServer.settingModel.AxisItems[i].Mpos = MposStatus[i];
+                    _IsettingServer.settingModel.AxisItems[i].Status = AxisStatus[i];
+                }
+
                 //停止
                 if (inputStatus[0] == 0)
                 {
@@ -98,16 +105,12 @@ namespace ToolCollisionCalibration.ViewModels
                     cts.Cancel();
                 }
                 ///判断上升沿启动
-                if (inputStatus[5] == 1 && ListOldSinal[5] == 0 && !LeftIsRunning)
+                if (inputStatus[5] == 1 && ListOldSinal[5] == 0 && !_IsettingServer.settingModel.IsRunning)
                 {
-                    LeftIsRunning = true;
-                    LeftStart();
+                    _IsettingServer.settingModel.IsRunning = true;
+                    Start();
                 }
-                if (inputStatus[7] == 1 && ListOldSinal[7] == 0 && !RightIsRunning)
-                {
-                    RightIsRunning = true;
-                }
-                for (int i = 0; i < 15; i++)
+                for (int i = 0; i < 32; i++)
                 {
                     ListOldSinal[i] = inputStatus[i];
                 }
@@ -128,17 +131,17 @@ namespace ToolCollisionCalibration.ViewModels
         /// 测试前所有初始化
         /// </summary>
         /// <returns></returns>
-        private async Task<bool> LeftStartInit()
+        private async Task<bool> StartInit()
         {
-            LeftTestResult = "运行中";
+            TestResult = "运行中";
             cts = new CancellationTokenSource();
             dataBaseModel = new DataBaseModel();
             //OK灯复位
-            PulseADIOControler.ZAux_Direct_SetOp(2, 0);
+            motionCard.ZAux_Direct_SetOp(2, 0);
             //NG灯复位
-            PulseADIOControler.ZAux_Direct_SetOp(4, 0);
+            motionCard.ZAux_Direct_SetOp(4, 0);
             //测试灯运行
-            PulseADIOControler.ZAux_Direct_SetOp(3, 1);
+            motionCard.ZAux_Direct_SetOp(3, 1);
             return true;
         }
         /// <summary>
@@ -147,10 +150,10 @@ namespace ToolCollisionCalibration.ViewModels
         private void LeftEndInits()
         {
             //打开排水阀
-            PulseADIOControler.ZAux_Direct_SetOp(1, 0);
-            PulseADIOControler.ZAux_Direct_SetOp(3, 0);
-            PulseADIOControler.ZAux_Direct_SetOp(12, 0);
-            LeftIsRunning = false;
+            motionCard.ZAux_Direct_SetOp(1, 0);
+            motionCard.ZAux_Direct_SetOp(3, 0);
+            motionCard.ZAux_Direct_SetOp(12, 0);
+            _IsettingServer.settingModel.IsRunning = false;
         }
         protected void OnPropertyChanged(string propertyName)
         {
@@ -162,7 +165,7 @@ namespace ToolCollisionCalibration.ViewModels
             }
         }
 
-        private void LeftStart()
+        private void Start()
         {
             Task.Run(async () =>
             {
@@ -171,12 +174,12 @@ namespace ToolCollisionCalibration.ViewModels
                 }
                 catch (OperationCanceledException)
                 {
-                    LeftTestResult = "NG";
+                    TestResult = "NG";
                     Log.Write("人工强制停止运行!",LogType.提示);
                 }
                 catch (Exception ex)
                 {
-                    LeftTestResult = "NG";
+                    TestResult = "NG";
                     Log.Write(ex.ToString(), LogType.错误);
                 }
                 finally

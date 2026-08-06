@@ -18,6 +18,7 @@ namespace ToolCollisionCalibration.Models
         public int AxisNumber {  get; set; }
 
         public string AxisName { get; set; }
+        public int IdleStatus{ get; set; }
 
         public float Dpos { get; set; }
 
@@ -33,10 +34,6 @@ namespace ToolCollisionCalibration.Models
 
         public Brush StatusColor => Status == 0 ? Brushes.Red : Brushes.Green;
 
-        public uint HomeStatus { get; set; }
-
-        public string HomeStatusText => HomeStatus == 1 ? "已回零" : "未回零";
-
         public AxisParamModel Param { get; set; }
 
 
@@ -49,10 +46,6 @@ namespace ToolCollisionCalibration.Models
                 PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(StatusText)));
                 PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(StatusColor)));
             } 
-            if(propertyName == nameof(HomeStatus))
-            {
-                PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(HomeStatusText)));
-            }
         }
     }
 

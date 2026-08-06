@@ -42,7 +42,7 @@ namespace ToolCollisionCalibration.Devices
         /// 回原
         /// </summary>
         /// <param name="AxisNumber">轴号</param>
-        public async Task<ResultInfo> ReturnOriginal(int AxisNumber)
+        public async Task<ResultInfo> ReturnOrigin(int AxisNumber)
         {
             int OriginIOnum = 0;
             if (AxisNumber == 1) OriginIOnum = 1;

@@ -20,6 +20,13 @@ namespace ToolCollisionCalibration.Models
         public LocalParams localparams { get; set; } = new LocalParams();
         public DBParams DBParams { get; set; } = new DBParams();
         public ObservableCollection<AxisItem> AxisItems { get; set; } = new ObservableCollection<AxisItem>();
+
+        /// <summary>
+        /// 运行状态
+        /// </summary>
+        public bool IsRunning { get; set; } = false;
+
+
         public event PropertyChangedEventHandler PropertyChanged;
         protected void OnPropertyChanged(string propertyName)
         {
