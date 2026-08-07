@@ -116,10 +116,10 @@
                                 </Grid.ColumnDefinitions>
 
                                 <TextBlock Grid.Column="0" Text="{Binding AxisName}" HorizontalAlignment="Center" VerticalAlignment="Center"/>
-                                <TextBlock Grid.Column="1" Text="{Binding Dpos, StringFormat=F2}" HorizontalAlignment="Center" VerticalAlignment="Center"/>
-                                <TextBlock Grid.Column="2" Text="{Binding Mpos, StringFormat=F2}" HorizontalAlignment="Center" VerticalAlignment="Center"/>
-                                <TextBlock Grid.Column="3" Text="{Binding Speed, StringFormat=F2}" HorizontalAlignment="Center" VerticalAlignment="Center"/>
-                                <TextBlock Grid.Column="4" Text="{Binding StatusText}" HorizontalAlignment="Center" VerticalAlignment="Center" Foreground="{Binding StatusColor}"/>
+                                <TextBlock Grid.Column="1" Text="{Binding Dpos}" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                <TextBlock Grid.Column="2" Text="{Binding Mpos}" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                <TextBlock Grid.Column="3" Text="{Binding Speed}" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                <TextBlock Grid.Column="4" Text="{Binding IdleStatusText}" HorizontalAlignment="Center" VerticalAlignment="Center"/>
                                 <Button Grid.Column="5" Content="+" Width="50" Height="28">
                                     <i:Interaction.Triggers>
                                         <i:EventTrigger EventName="PreviewMouseDown">
@@ -140,8 +140,8 @@
                                             <prism:InvokeCommandAction Command="{Binding DataContext.AxisStopCommand, RelativeSource={RelativeSource AncestorType=UserControl}}" CommandParameter="{Binding AxisNumber}"/>
                                         </i:EventTrigger>
                                         <i:EventTrigger EventName="PreviewMouseUp">
-    <prism:InvokeCommandAction Command="{Binding DataContext.AxisStopCommand, RelativeSource={RelativeSource AncestorType=UserControl}}" CommandParameter="{Binding AxisNumber}"/>
-</i:EventTrigger>
+                                        <prism:InvokeCommandAction Command="{Binding DataContext.AxisStopCommand, RelativeSource={RelativeSource AncestorType=UserControl}}" CommandParameter="{Binding AxisNumber}"/>
+                                    </i:EventTrigger>
                                     </i:Interaction.Triggers>
                                 </Button> 
                                 <Button Grid.Column="7" Content="停止" Command="{Binding DataContext.AxisStopCommand, RelativeSource={RelativeSource AncestorType=UserControl}}" CommandParameter="{Binding AxisNumber}" Width="50" Height="28"/>
@@ -155,7 +155,7 @@
 
                 <TextBlock Text="轴参数设置" FontSize="14" FontWeight="Bold" Margin="0,10,0,5"/>
 
-                <ItemsControl ItemsSource="{Binding settingServer.settingModel.AxisItems}" IsEnabled="False">
+                <ItemsControl ItemsSource="{Binding settingServer.settingModel.AxisItems}">
                     <ItemsControl.ItemTemplate>
                         <DataTemplate>
                             <Border Margin="0,3,0,3" BorderBrush="Gray" BorderThickness="1" Padding="8">
@@ -248,7 +248,7 @@
                         <Button Content="销钉气缸伸出" Height="36" Margin="5" Style="{StaticResource IOButtonStyle}"/>
                         <Button Content="定位气缸伸出" Height="36" Margin="5" Style="{StaticResource IOButtonStyle}"/>
                         <Button Content="定位气缸缩回" Height="36" Margin="5" Style="{StaticResource IOButtonStyle}"/>
-                        <Button Content="备用" Height="36" Margin="5" Style="{StaticResource IOButtonStyle}"/>
+                        <Button Content="保存参数" Command="{Binding SaveParamsCommand}" Height="36" Margin="5" Style="{StaticResource IOButtonStyle}"/>
                         <Button Content="备用" Height="36" Margin="5" Style="{StaticResource IOButtonStyle}"/>
                         <Button Content="备用" Height="36" Margin="5" Style="{StaticResource IOButtonStyle}"/>
                         <Button Content="备用" Height="36" Margin="5" Style="{StaticResource IOButtonStyle}"/>

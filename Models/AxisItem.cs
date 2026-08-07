@@ -19,6 +19,7 @@ namespace ToolCollisionCalibration.Models
 
         public string AxisName { get; set; }
         public int IdleStatus{ get; set; }
+        public string IdleStatusText => IdleStatus == 0 ? "运动中" : "停止中";
 
         public float Dpos { get; set; }
 
@@ -30,11 +31,7 @@ namespace ToolCollisionCalibration.Models
         /// </summary>
         public int Status { get; set; }
 
-        public string StatusText => Status == 0 ? "运动中" : "停止";
-
         public string HomeStatus { get; set; } = "未回零";
-
-        public Brush StatusColor => Status == 0 ? Brushes.Red : Brushes.Green;
 
         public AxisParamModel Param { get; set; }
 
@@ -43,10 +40,9 @@ namespace ToolCollisionCalibration.Models
         protected void OnPropertyChanged(string propertyName)
         {
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
-            if (propertyName == nameof(Status))
+            if (propertyName == nameof(IdleStatus))
             {
-                PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(StatusText)));
-                PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(StatusColor)));
+                PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(IdleStatusText)));
             } 
         }
     }

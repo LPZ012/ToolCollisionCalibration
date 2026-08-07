@@ -12,7 +12,6 @@ using ToolCollisionCalibration.Servers.Setting;
 using WPFLibrary.Logger;
 using WPFLibrary.Logger.DataGridLog;
 using WPFLibrary.Scanner;
-using WPFLibrary.Zmotion;
 namespace ToolCollisionCalibration.ViewModels
 {
     public class ViewAModel:INotifyPropertyChanged

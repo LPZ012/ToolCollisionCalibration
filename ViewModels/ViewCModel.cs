@@ -16,6 +16,7 @@ namespace ToolCollisionCalibration.ViewModels
         public ViewCModel(ISettingServer settingServer) 
         {
             this.settingServer = settingServer;
+            SaveParamsCommand = new DelegateCommand(() => settingServer.WriteSetting());
             JogForwardMoveCommand = new DelegateCommand<object>(OnJogForwardMove);
             JogReverseMoveCommand = new DelegateCommand<object>(OnJogReverseMove);
             AxisStopCommand = new DelegateCommand<object>(OnAxisStop);
@@ -32,6 +33,7 @@ namespace ToolCollisionCalibration.ViewModels
         /// Y轴绝对移动位置
         /// </summary>
         public float Y_AbsMovePostion { get; set; }
+        public DelegateCommand SaveParamsCommand { get; }
         public DelegateCommand<object> JogForwardMoveCommand { get; }
         public DelegateCommand<object> JogReverseMoveCommand { get; }
         public DelegateCommand<object> AxisStopCommand { get; }

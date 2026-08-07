@@ -78,11 +78,11 @@ namespace ToolCollisionCalibration.Servers.Setting
         {
             try
             {
-                if (string.IsNullOrEmpty(settingModel.DBParams.ProductModel)) 
-                {
-                    MessageBox.Show("型号不能为空", "提示", MessageBoxButton.OK, MessageBoxImage.Warning);
-                    return false;
-                }
+                //if (string.IsNullOrEmpty(settingModel.DBParams.ProductModel)) 
+                //{
+                //    MessageBox.Show("型号不能为空", "提示", MessageBoxButton.OK, MessageBoxImage.Warning);
+                //    return false;
+                //}
                 bool result = JsonHelper.WriteJson<LocalParams>(FilePath.ParameterFolder, FilePath.ParameterJsonFileName, settingModel.localparams);
                 string modeljsonfilmname = FilePath.DBParamFolder + $@"\{settingModel.DBParams.ProductModel}.json";
                 result &= JsonHelper.WriteJson<DBParams>(FilePath.DBParamFolder, modeljsonfilmname, settingModel.DBParams);
