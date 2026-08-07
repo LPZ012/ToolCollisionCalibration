@@ -77,7 +77,7 @@ namespace ToolCollisionCalibration.ViewModels
         /// <param name="Command"></param>
         public void MoveAbs(string  Command)
         {
-            if (settingServer.settingModel.IsRunning || !settingServer.settingModel.IsReset) return;
+            if (settingServer.settingModel.IsRunning) return;
             switch (Command)
             {
 
@@ -96,7 +96,7 @@ namespace ToolCollisionCalibration.ViewModels
         /// <param name="AxisNumber">轴号</param>
         private void OnJogForwardMove(object AxisNumber)
         {
-            if (settingServer.settingModel.IsRunning || !settingServer.settingModel.IsReset) return;
+            if (settingServer.settingModel.IsRunning) return;
             int axisNumber = Convert.ToInt32(AxisNumber);
             motionCard.JogMove(axisNumber, 1);
         }
@@ -107,7 +107,7 @@ namespace ToolCollisionCalibration.ViewModels
         /// <param name="AxisNumber">轴号</param>
         private void OnJogReverseMove(object AxisNumber)
         {
-            if (settingServer.settingModel.IsRunning || !settingServer.settingModel.IsReset) return;
+            if (settingServer.settingModel.IsRunning) return;
             int axisNumber = Convert.ToInt32(AxisNumber);
             motionCard.JogMove(axisNumber, -1);
         }
@@ -118,7 +118,7 @@ namespace ToolCollisionCalibration.ViewModels
         /// <param name="AxisNumber">轴号</param>
         private void OnAxisStop(object AxisNumber)
         {
-            if (settingServer.settingModel.IsRunning || !settingServer.settingModel.IsReset) return;
+            if (settingServer.settingModel.IsRunning) return;
             int axisNumber = Convert.ToInt32(AxisNumber);
             motionCard.AxisStop(axisNumber);
         }
@@ -129,7 +129,7 @@ namespace ToolCollisionCalibration.ViewModels
         /// <param name="AxisNumber">轴号</param>
         private async void OnReturnOriginal(object AxisNumber)
         {
-            if (settingServer.settingModel.IsRunning || !settingServer.settingModel.IsReset) return;
+            if (settingServer.settingModel.IsRunning) return;
             int axisNumber = Convert.ToInt32(AxisNumber);
             await Task.Run(() => motionCard.ReturnOrigin(axisNumber));
         }
