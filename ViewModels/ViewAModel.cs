@@ -39,9 +39,15 @@ namespace ToolCollisionCalibration.ViewModels
         /// 测试结果
         /// </summary>
         public string TestResult { get; set; }
-
+        /// <summary>
+        /// 软件刚启动标志位
+        /// </summary>
         private bool JustStartUp = true;
-        
+        /// <summary>
+        /// 是否正在复位中
+        /// </summary>
+        private bool IsResetting = false;
+
         public ISettingServer _IsettingServer { get; set; }
         /// <summary>
         /// 日志
@@ -149,44 +155,49 @@ namespace ToolCollisionCalibration.ViewModels
         private void Reset()
         {
             Task.Run(async () =>
-            {
-                //电阻气缸缩回要检查到位信号
-                //定位气缸缩回
-                //销钉气缸缩回
-                if (JustStartUp)    //软件刚启动需要进行轴回零操作后
+            { 
+                if(!IsResetting)
                 {
-                    var Axis1Result = await motionCard.ReturnOrigin(1);
-                    if(Axis1Result.IsSuccess)
-                    {
-                        settingModel.AxisItems[1].HomeStatus = "已回零";
-                    }
-                    else
-                    {
-                        Log.Write("X轴销钉轴回零失败。", LogType.错误);
-                        return;
-                    }
-                    var Axis2Result = await motionCard.ReturnOrigin(2);
-                    if (Axis2Result.IsSuccess)
-                    {
-                        settingModel.AxisItems[2].HomeStatus = "已回零";
-                    }
-                    else
-                    {
-                        Log.Write("Y轴定位轴回零失败。", LogType.错误);
-                        return;
-                    }
-                    JustStartUp = false;
+                    Log.Write("复位中,请勿重复复位。", LogType.提示);
+                    await ResetMachine();
+                    IsResetting = false;
                 }
-                //回到默认位置
-                await AxisBack();
             });
             
         }
         /// <summary>
         /// 轴回到默认位置
         /// </summary>
-        private async Task AxisBack()
+        private async Task ResetMachine()
         {
+            _IsettingServer.settingModel.IsReset = false;
+            //电阻气缸缩回要检查到位信号
+            //定位气缸缩回
+            //销钉气缸缩回
+            if (JustStartUp)    //软件刚启动需要进行轴回零操作后
+            {
+                var Axis1Result = await motionCard.ReturnOrigin(1);
+                if (Axis1Result.IsSuccess)
+                {
+                    settingModel.AxisItems[1].HomeStatus = "已回零";
+                }
+                else
+                {
+                    Log.Write("X轴销钉轴回零失败。", LogType.错误);
+                    return;
+                }
+                var Axis2Result = await motionCard.ReturnOrigin(2);
+                if (Axis2Result.IsSuccess)
+                {
+                    settingModel.AxisItems[2].HomeStatus = "已回零";
+                }
+                else
+                {
+                    Log.Write("Y轴定位轴回零失败。", LogType.错误);
+                    return;
+                }
+                JustStartUp = false;
+            }
             motionCard.MoveAbs(1, settingModel.localparams.X_TakePinPosition);
             var AxisIdleResult = await motionCard.ZAux_Direct_GetIfIdle_Continuously(1, 100);
             if(!AxisIdleResult.IsSuccess)
@@ -214,22 +225,18 @@ namespace ToolCollisionCalibration.ViewModels
             cts = new CancellationTokenSource();
             dataBaseModel = new DataBaseModel();
             //OK灯复位
-            motionCard.ZAux_Direct_SetOp(2, 0);
+            motionCard.ZAux_Direct_SetOp(7, 0);
             //NG灯复位
-            motionCard.ZAux_Direct_SetOp(4, 0);
+            motionCard.ZAux_Direct_SetOp(8, 0);
             //测试灯运行
-            motionCard.ZAux_Direct_SetOp(3, 1);
             return true;
         }
         /// <summary>
         /// 测试结束初始化
         /// </summary>
-        private void LeftEndInits()
+        private async Task EndInits()
         {
-            //打开排水阀
-            motionCard.ZAux_Direct_SetOp(1, 0);
-            motionCard.ZAux_Direct_SetOp(3, 0);
-            motionCard.ZAux_Direct_SetOp(12, 0);
+            await ResetMachine();
             _IsettingServer.settingModel.IsRunning = false;
         }
         protected void OnPropertyChanged(string propertyName)
@@ -252,16 +259,18 @@ namespace ToolCollisionCalibration.ViewModels
                 catch (OperationCanceledException)
                 {
                     TestResult = "NG";
+                    _IsettingServer.settingModel.IsReset = false;
                     Log.Write("人工强制停止运行!",LogType.提示);
                 }
                 catch (Exception ex)
                 {
                     TestResult = "NG";
+                    _IsettingServer.settingModel.IsReset = false;
                     Log.Write(ex.ToString(), LogType.错误);
                 }
                 finally
                 {
-                    LeftEndInits();
+                    await EndInits();
                 }
             });
 
