@@ -30,6 +30,18 @@ namespace ToolCollisionCalibration.Devices
         }
 
         /// <summary>
+        /// 带运动完成信号的绝对运动
+        /// </summary>
+        /// <param name="AxisNumber"></param>
+        /// <param name="Position"></param>
+        /// <returns></returns>
+        public ResultInfo MoveAbs(int AxisNumber, float Position)
+        {
+            var axisparam = axisParamModels[AxisNumber];
+            return  ZAux_Direct_Single_MoveAbs(AxisNumber, axisparam, Position);
+        }
+
+        /// <summary>
         /// 轴停止
         /// </summary>
         /// <param name="AxisNumber">轴号</param>
@@ -45,12 +57,11 @@ namespace ToolCollisionCalibration.Devices
         public async Task<ResultInfo> ReturnOrigin(int AxisNumber)
         {
             int OriginIOnum = 0;
-            if (AxisNumber == 1) OriginIOnum = 1;
-            else if (AxisNumber == 2) OriginIOnum = 2;
+            if (AxisNumber == 1) OriginIOnum = 5;
+            else if (AxisNumber == 2) OriginIOnum = 8;
             else return new ResultInfo();
             var axisparam = axisParamModels[AxisNumber];
-
-            return await ReturnOriginal(AxisNumber, axisparam, -999999, 100, OriginIOnum, 2);
+            return await ReturnOriginal(AxisNumber, axisparam, -9999, 100, OriginIOnum, 3);
         }
     }
 }

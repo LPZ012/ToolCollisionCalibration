@@ -223,7 +223,7 @@
                             <Button Command="{Binding SetPositionCommand}" CommandParameter="Y_TakePinPositionCommand" Content="Y轴取销钉位置标定" Width="130" Height="35" Style="{StaticResource CalButtonStyle}"/>
                             <TextBlock Text="{Binding settingServer.settingModel.localparams.Y_TakePinPosition}" FontSize="13" VerticalAlignment="Center" Margin="10,0,150,0"/>
                             <Button Grid.Column="2" Command="{Binding AbsMoveCommand}" CommandParameter="X_AbsMoveCommand" Content="X轴绝对运动" Width="130" Height="35" Style="{StaticResource CalButtonStyle}"/>
-                            <TextBox IsEnabled="False" Text="{Binding X_AbsMovePostion}" FontSize="13" VerticalAlignment="Center" TextAlignment="Center" Width="100" Margin="10,0,40,0"/>
+                            <TextBox Text="{Binding X_AbsMovePostion}" FontSize="13" VerticalAlignment="Center" TextAlignment="Center" Width="100" Margin="10,0,40,0"/>
                         </StackPanel>
                         <StackPanel Grid.Row="1" Orientation="Horizontal" Margin="0,5,0,0">
                             <Button Command="{Binding SetPositionCommand}" CommandParameter="X_PinPositionCommand" Content="X轴打销钉位置标定" Width="130" Height="35" Style="{StaticResource CalButtonStyle}"/>

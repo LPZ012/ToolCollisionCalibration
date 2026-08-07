@@ -24,7 +24,7 @@ namespace ToolCollisionCalibration.ViewModels
             eventAggregator.GetEvent<ViewBToViewAServer>().Subscribe(ViewBToViewAEvent);
             Points.CollectionChanged += (s, e) => UpdateStatus();
             UpdateStatus();
-            //InitializeTimer();
+            InitializeTimer();
 
         }
         ///////////////////////////////设备/////////////////////////////////////////
@@ -41,7 +41,7 @@ namespace ToolCollisionCalibration.ViewModels
         /// </summary>
         public string TestResult { get; set; }
 
-
+        private bool JustStartUp = true;
         
         public ISettingServer _IsettingServer { get; set; }
         /// <summary>
@@ -52,14 +52,15 @@ namespace ToolCollisionCalibration.ViewModels
         public event PropertyChangedEventHandler PropertyChanged;
         private DispatcherTimer _refreshTimer;
         private CancellationTokenSource cts = new CancellationTokenSource();
-        private uint[] ListOldSinal = new uint[32];
+        private uint[] ListOldSinal = new uint[36];
         /// <summary>
         /// 输入口的各个点位状态
         /// </summary>
-		private uint[] inputStatus = new uint[32];
+		private uint[] inputStatus = new uint[36];
 		public DataBaseModel dataBaseModel { get; set; } = new DataBaseModel();
         private DateTime StartTime;
         public double TestTime { get; set;  }
+        int[] IdleStatus = new int[4]; float[] DposStatus = new float[4]; float[] MposStatus = new float[4]; int[] AxisStatus = new int[4];
 
         private ViewBToViewAModel viewBToViewA = new ViewBToViewAModel();
 
@@ -84,8 +85,7 @@ namespace ToolCollisionCalibration.ViewModels
         {
             try
             {
-                int[] IdleStatus = new int[4]; float[] DposStatus = new float[4]; float[] MposStatus = new float[4];  int[] AxisStatus = new int[4];
-                for (int i = 0; i < 32; i++)
+                for (int i = 0; i < 36; i++)
                 {
                     motionCard.ZAux_Direct_GetIn(i, ref inputStatus[i]);
                 }
@@ -97,20 +97,41 @@ namespace ToolCollisionCalibration.ViewModels
                     _IsettingServer.settingModel.AxisItems[i].Mpos = MposStatus[i];
                     _IsettingServer.settingModel.AxisItems[i].Status = AxisStatus[i];
                 }
-
-                //停止
-                if (inputStatus[0] == 0)
+                if (inputStatus[3] == 1 && ListOldSinal[3] == 0)
                 {
-                    Log.Write("停止被按下。", LogType.提示);
+                    Reset();
+                }
+                //停止加光栅
+                if (inputStatus[4] == 0 || inputStatus[13] == 0)
+                {
+                    //轴运动立即停止
+                    motionCard.ZAux_Direct_CancelAxisList(4, new int[] { 0, 1, 2, 3 }, 2);
                     cts.Cancel();
+                    Log.Write("停止被按下或光栅被遮挡。", LogType.提示);
+                    _IsettingServer.settingModel.IsReset = false;
                 }
                 ///判断上升沿启动
-                if (inputStatus[5] == 1 && ListOldSinal[5] == 0 && !_IsettingServer.settingModel.IsRunning)
+                if (inputStatus[12] == 1 && ListOldSinal[12] == 0 && inputStatus[11] == 1 && ListOldSinal[11] == 0 && inputStatus[4] == 1 && inputStatus[13] == 1 && !_IsettingServer.settingModel.IsRunning)
                 {
-                    _IsettingServer.settingModel.IsRunning = true;
-                    Start();
+                    if (inputStatus[0] == 1)
+                    {
+                        if (_IsettingServer.settingModel.IsReset)
+                        {
+                            _IsettingServer.settingModel.IsRunning = true;
+                            Start();
+                        }
+                        else
+                        {
+                            Log.Write("请复位再启动。", LogType.提示);
+                        }
+                    }
+                    else
+                    {
+                        Log.Write("销钉气缸未缩回到位，请检查气缸缩回到位信号是否亮起。", LogType.提示);
+                    }
+                    
                 }
-                for (int i = 0; i < 32; i++)
+                for (int i = 0; i < 36; i++)
                 {
                     ListOldSinal[i] = inputStatus[i];
                 }
@@ -124,6 +145,63 @@ namespace ToolCollisionCalibration.ViewModels
 
         private void ViewBToViewAEvent(ViewBToViewAModel viewBToViewAModel)
         {
+        }
+
+        private void Reset()
+        {
+            Task.Run(async () =>
+            {
+                //电阻气缸缩回要检查到位信号
+                //定位气缸缩回
+                //销钉气缸缩回
+                if (JustStartUp)    //软件刚启动需要进行轴回零操作后
+                {
+                    var Axis1Result = await motionCard.ReturnOrigin(1);
+                    if(Axis1Result.IsSuccess)
+                    {
+                        settingModel.AxisItems[1].HomeStatus = "已回零";
+                    }
+                    else
+                    {
+                        Log.Write("X轴销钉轴回零失败。", LogType.错误);
+                        return;
+                    }
+                    var Axis2Result = await motionCard.ReturnOrigin(2);
+                    if (Axis2Result.IsSuccess)
+                    {
+                        settingModel.AxisItems[2].HomeStatus = "已回零";
+                    }
+                    else
+                    {
+                        Log.Write("Y轴定位轴回零失败。", LogType.错误);
+                        return;
+                    }
+                    JustStartUp = false;
+                }
+                //回到默认位置
+                await AxisBack();
+            });
+            
+        }
+        /// <summary>
+        /// 轴回到默认位置
+        /// </summary>
+        private async Task AxisBack()
+        {
+            motionCard.MoveAbs(1, settingModel.localparams.X_TakePinPosition);
+            var AxisIdleResult = await motionCard.ZAux_Direct_GetIfIdle_Continuously(1, 100);
+            if(!AxisIdleResult.IsSuccess)
+            {
+                Log.Write("X轴回取销钉位置失败。" + AxisIdleResult.ErrMessage, LogType.错误);
+                return;
+            }
+            AxisIdleResult = await motionCard.ZAux_Direct_GetIfIdle_Continuously(2, 100);
+            if (!AxisIdleResult.IsSuccess)
+            {
+                Log.Write("Y轴回初始位置失败。" + AxisIdleResult.ErrMessage, LogType.错误);
+                return;
+            }
+            _IsettingServer.settingModel.IsReset = true;
         }
 
 

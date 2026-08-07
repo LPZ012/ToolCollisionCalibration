@@ -32,6 +32,8 @@ namespace ToolCollisionCalibration.Models
 
         public string StatusText => Status == 0 ? "运动中" : "停止";
 
+        public string HomeStatus { get; set; } = "未回零";
+
         public Brush StatusColor => Status == 0 ? Brushes.Red : Brushes.Green;
 
         public AxisParamModel Param { get; set; }

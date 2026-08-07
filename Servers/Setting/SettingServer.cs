@@ -21,7 +21,7 @@ namespace ToolCollisionCalibration.Servers.Setting
         public SettingServer()
         {
             LoadSettingAsync();
-            //InitDevices();
+            InitDevices();
         }
         public SettingModel settingModel { get; set; } = new SettingModel();
         
@@ -105,8 +105,8 @@ namespace ToolCollisionCalibration.Servers.Setting
         /// </summary>
         public void InitDevices()
         {
-            Scanner = new ScanHome(settingModel.localparams.ScannerModel);
-            AngleDevice = new OID_R2_3806D_15S1S(settingModel.localparams.AngleModel,32768);
+            //Scanner = new ScanHome(settingModel.localparams.ScannerModel);
+            //AngleDevice = new OID_R2_3806D_15S1S(settingModel.localparams.AngleModel,32768);
             motionCard = new MotionCard(new WPFLibrary.Sockets.TCPIP.TCPIPModel("192.168.0.11",1000,"motionCard"),settingModel.localparams.AxisParamModels);
         }
 

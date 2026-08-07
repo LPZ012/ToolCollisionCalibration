@@ -25,6 +25,10 @@ namespace ToolCollisionCalibration.Models
         /// 运行状态
         /// </summary>
         public bool IsRunning { get; set; } = false;
+        /// <summary>
+        /// 复位状态
+        /// </summary>
+        public bool IsReset { get; set; } = false;
 
 
         public event PropertyChangedEventHandler PropertyChanged;
