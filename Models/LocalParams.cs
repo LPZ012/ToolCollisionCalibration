@@ -6,10 +6,11 @@ using System.Text;
 using System.Threading.Tasks;
 using WPFLibrary.ComSerialPort;
 using WPFLibrary.Zmotion;
+using System.ComponentModel;
 
 namespace ToolCollisionCalibration.Models
 {
-    public class LocalParams
+    public class LocalParams: INotifyPropertyChanged
     {
         /// <summary>
         /// 扫码使能
@@ -42,5 +43,10 @@ namespace ToolCollisionCalibration.Models
         public SerialPortModel AngleModel { get; set; }
         public List<AxisParamModel> AxisParamModels { get; set; }
 
-	}
+        public event PropertyChangedEventHandler PropertyChanged;
+        protected void OnPropertyChanged(string propertyName)
+        {
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+        }
+    }
 }
