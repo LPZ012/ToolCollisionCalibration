@@ -1,4 +1,5 @@
 ﻿using HPSocket;
+using Org.BouncyCastle.Asn1.Cms;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -16,8 +17,34 @@ namespace ToolCollisionCalibration.Devices
         public MotionCard(TCPIPModel tCPIPModel,List<AxisParamModel> axisParamModels) : base(tCPIPModel)
         {
             this.axisParamModels = axisParamModels;
+            Init();
         }
         private readonly List<AxisParamModel> axisParamModels;
+
+
+        /// <summary>
+        /// 初始化
+        /// </summary>
+        private void Init()
+        {
+            SetAxisLimitIn(1, 7, 5, 6);
+            SetAxisLimitIn(2, 10, 8, 9);
+        }
+
+        /// <summary>
+        /// 设置轴的正限位、原点、负限位输入信号
+        /// </summary>
+        /// <param name="iaxis">轴号</param>
+        /// <param name="FwdIn">正限位</param>
+        /// <param name="OriginIn">原点</param>
+        /// <param name="RevIn">负限位</param>
+        private void SetAxisLimitIn(int iaxis, int FwdIn,int DatumIn, int RevIn)
+        {
+            ZAux_Direct_SetFwdIn(iaxis, FwdIn);
+            ZAux_Direct_SetDatumIn(iaxis, DatumIn);
+            ZAux_Direct_SetRevIn(iaxis, RevIn);
+        }
+
         /// <summary>
         /// 点动
         /// </summary>
@@ -61,7 +88,7 @@ namespace ToolCollisionCalibration.Devices
             else if (AxisNumber == 2) OriginIOnum = 8;
             else return new ResultInfo();
             var axisparam = axisParamModels[AxisNumber];
-            return await ReturnOriginal(AxisNumber, axisparam, -9999, 100, OriginIOnum, 3);
+            return await ReturnOriginal(AxisNumber, axisparam, -9999, OriginIOnum, 3);
         }
     }
 }
