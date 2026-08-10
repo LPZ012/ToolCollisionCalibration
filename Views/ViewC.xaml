@@ -5,6 +5,7 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:i="http://schemas.microsoft.com/xaml/behaviors"
              xmlns:prism="http://prismlibrary.com/"
+             xmlns:textboxlimit="clr-namespace:WPFLibrary.AdditiveAttribute;assembly=WPFLibrary"
              xmlns:local="clr-namespace:ToolCollisionCalibration.Views"
              mc:Ignorable="d" 
              d:DesignHeight="650" d:DesignWidth="1000">
@@ -182,27 +183,27 @@
                                     <TextBlock Grid.Column="0" Grid.Row="0" Grid.RowSpan="2" Text="{Binding AxisName}" FontWeight="Bold" VerticalAlignment="Center"/>
 
                                     <TextBlock Grid.Column="1" Grid.Row="0" Text="脉冲当量:" VerticalAlignment="Center"/>
-                                    <TextBox Grid.Column="2" Grid.Row="0" Text="{Binding Param.Units, StringFormat=F2}" Width="70" TextAlignment="Right"/>
+                                    <TextBox Grid.Column="2" Grid.Row="0" Text="{Binding Param.Units, StringFormat=F2}" Width="70" TextAlignment="Right" textboxlimit:TextBoxInputLimit.IsNumericOnly="True"/>
                                     <TextBlock Grid.Column="3" Grid.Row="0" Text="units/mm" VerticalAlignment="Center" FontSize="10"/>
 
                                     <TextBlock Grid.Column="5" Grid.Row="0" Text="最小速度:" VerticalAlignment="Center"/>
-                                    <TextBox Grid.Column="6" Grid.Row="0" Text="{Binding Param.Lspeed, StringFormat=F2}" Width="70" TextAlignment="Right"/>
+                                    <TextBox Grid.Column="6" Grid.Row="0" Text="{Binding Param.Lspeed, StringFormat=F2}" Width="70" TextAlignment="Right" textboxlimit:TextBoxInputLimit.IsNumericOnly="True" textboxlimit:TextBoxInputLimit.MinValue="0"/>
                                     <TextBlock Grid.Column="7" Grid.Row="0" Text="units/s" VerticalAlignment="Center" FontSize="10"/>
 
                                     <TextBlock Grid.Column="9" Grid.Row="0" Text="运行速度:" VerticalAlignment="Center"/>
-                                    <TextBox Grid.Column="10" Grid.Row="0" Text="{Binding Param.Speed, StringFormat=F2}" Width="70" TextAlignment="Right"/>
+                                    <TextBox Grid.Column="10" Grid.Row="0" Text="{Binding Param.Speed, StringFormat=F2}" Width="70" TextAlignment="Right" textboxlimit:TextBoxInputLimit.IsNumericOnly="True" textboxlimit:TextBoxInputLimit.MaxValue="100" textboxlimit:TextBoxInputLimit.MinValue="0"/>
                                     <TextBlock Grid.Column="11" Grid.Row="0" Text="units/s" VerticalAlignment="Center" FontSize="10"/>
 
                                     <TextBlock Grid.Column="1" Grid.Row="1" Text="加速度:" VerticalAlignment="Center"/>
-                                    <TextBox Grid.Column="2" Grid.Row="1" Text="{Binding Param.Accel, StringFormat=F2}" Width="70" TextAlignment="Right"/>
+                                    <TextBox Grid.Column="2" Grid.Row="1" Text="{Binding Param.Accel, StringFormat=F2}" Width="70" TextAlignment="Right" textboxlimit:TextBoxInputLimit.IsNumericOnly="True" textboxlimit:TextBoxInputLimit.MinValue="100" textboxlimit:TextBoxInputLimit.MaxValue="500"/>
                                     <TextBlock Grid.Column="3" Grid.Row="1" Text="units/s²" VerticalAlignment="Center" FontSize="10"/>
 
                                     <TextBlock Grid.Column="5" Grid.Row="1" Text="减速度:" VerticalAlignment="Center"/>
-                                    <TextBox Grid.Column="6" Grid.Row="1" Text="{Binding Param.Decel, StringFormat=F2}" Width="70" TextAlignment="Right"/>
+                                    <TextBox Grid.Column="6" Grid.Row="1" Text="{Binding Param.Decel, StringFormat=F2}" Width="70" TextAlignment="Right" textboxlimit:TextBoxInputLimit.IsNumericOnly="True" textboxlimit:TextBoxInputLimit.MinValue="100"/>
                                     <TextBlock Grid.Column="7" Grid.Row="1" Text="units/s²" VerticalAlignment="Center" FontSize="10"/>
 
                                     <TextBlock Grid.Column="9" Grid.Row="1" Text="S曲线:" VerticalAlignment="Center"/>
-                                    <TextBox Grid.Column="10" Grid.Row="1" Text="{Binding Param.Sramp, StringFormat=F2}" Width="70" TextAlignment="Right"/>
+                                    <TextBox Grid.Column="10" Grid.Row="1" Text="{Binding Param.Sramp, StringFormat=F2}" Width="70" TextAlignment="Right" textboxlimit:TextBoxInputLimit.IsNumericOnly="True" textboxlimit:TextBoxInputLimit.MinValue="10"/>
                                     <TextBlock Grid.Column="11" Grid.Row="1" Text="ms" VerticalAlignment="Center" FontSize="10"/>
                                 </Grid>
                             </Border>
