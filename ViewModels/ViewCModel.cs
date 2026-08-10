@@ -8,14 +8,16 @@ using ToolCollisionCalibration.Devices;
 using ToolCollisionCalibration.Models;
 using ToolCollisionCalibration.Servers.Setting;
 using WPFLibrary.Logger;
+using WPFLibrary.Logger.DataGridLog;
 
 namespace ToolCollisionCalibration.ViewModels
 {
     public class ViewCModel : INotifyPropertyChanged
     {
-        public ViewCModel(ISettingServer settingServer) 
+        public ViewCModel(ISettingServer settingServer, IDataGridLogHelper Log) 
         {
             this.settingServer = settingServer;
+            this.Log = Log;
             SaveParamsCommand = new DelegateCommand(() => settingServer.WriteSetting());
             JogForwardMoveCommand = new DelegateCommand<object>(OnJogForwardMove);
             JogReverseMoveCommand = new DelegateCommand<object>(OnJogReverseMove);
@@ -82,10 +84,12 @@ namespace ToolCollisionCalibration.ViewModels
             {
 
                case "X_AbsMoveCommand":
-                    motionCard.ZAux_Direct_Single_MoveAbs(1, settingServer.settingModel.localparams.AxisParamModels[1], X_AbsMovePostion);
+                    var X_MoveAbsResult = motionCard.ZAux_Direct_Single_MoveAbs(1, settingServer.settingModel.localparams.AxisParamModels[1], X_AbsMovePostion);
+                    if(!X_MoveAbsResult.IsSuccess) Log.Write(X_MoveAbsResult.ErrMessage, LogType.错误);
                     break;
                 case "Y_AbsMoveCommand":
-                    motionCard.ZAux_Direct_Single_MoveAbs(2, settingServer.settingModel.localparams.AxisParamModels[2], Y_AbsMovePostion);
+                    var Y_MoveAbsResult = motionCard.ZAux_Direct_Single_MoveAbs(2, settingServer.settingModel.localparams.AxisParamModels[2], Y_AbsMovePostion);
+                    if (!Y_MoveAbsResult.IsSuccess) Log.Write(Y_MoveAbsResult.ErrMessage, LogType.错误);
                     break;
             }
         }
@@ -98,7 +102,8 @@ namespace ToolCollisionCalibration.ViewModels
         {
             if (settingServer.settingModel.IsRunning) return;
             int axisNumber = Convert.ToInt32(AxisNumber);
-            motionCard.JogMove(axisNumber, 1);
+            var JogForwardMoveResult = motionCard.JogMove(axisNumber, 1);
+            if (!JogForwardMoveResult.IsSuccess) Log.Write(JogForwardMoveResult.ErrMessage, LogType.错误);
         }
 
         /// <summary>
@@ -109,7 +114,8 @@ namespace ToolCollisionCalibration.ViewModels
         {
             if (settingServer.settingModel.IsRunning) return;
             int axisNumber = Convert.ToInt32(AxisNumber);
-            motionCard.JogMove(axisNumber, -1);
+            var JogReverseMoveResult =  motionCard.JogMove(axisNumber, -1);
+            if (!JogReverseMoveResult.IsSuccess) Log.Write(JogReverseMoveResult.ErrMessage, LogType.错误);
         }
 
         /// <summary>
@@ -120,7 +126,8 @@ namespace ToolCollisionCalibration.ViewModels
         {
             if (settingServer.settingModel.IsRunning) return;
             int axisNumber = Convert.ToInt32(AxisNumber);
-            motionCard.AxisStop(axisNumber);
+            var AxisStopResult =  motionCard.AxisStop(axisNumber);
+            if (!AxisStopResult.IsSuccess) Log.Write(AxisStopResult.ErrMessage, LogType.错误);
         }
 
         /// <summary>
@@ -131,7 +138,8 @@ namespace ToolCollisionCalibration.ViewModels
         {
             if (settingServer.settingModel.IsRunning) return;
             int axisNumber = Convert.ToInt32(AxisNumber);
-            await Task.Run(() => motionCard.ReturnOrigin(axisNumber));
+            var ReturnOriginResult =  await Task.Run(() => motionCard.ReturnOrigin(axisNumber));
+            if(!ReturnOriginResult.IsSuccess) Log.Write(ReturnOriginResult.ErrMessage, LogType.错误);
         }
 
         public event PropertyChangedEventHandler PropertyChanged;
