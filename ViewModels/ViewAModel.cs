@@ -171,11 +171,25 @@ namespace ToolCollisionCalibration.ViewModels
         private async Task ResetMachine()
         {
             _IsettingServer.settingModel.IsReset = false;
-            //电阻气缸缩回要检查到位信号
-            //定位气缸缩回
+
             //销钉气缸缩回
+            motionCard.ZAux_Direct_SetOp(1, 0);
+            //左定位气缸
+            //右定位气缸
+            //电阻气缸
+            motionCard.ZAux_Direct_SetOp(4, 0);
+            motionCard.ZAux_Direct_SetOp(5, 0);
+            await Task.Delay(1000);
+            //检查气缸是否缩回到位
+            if (inputStatus[18] == 0)
+            {
+                Log.Write("销钉气缸未缩回到位，请检查气缸缩回到位信号是否亮起。", LogType.错误);
+                return;
+            }
+
             if (JustStartUp)    //软件刚启动需要进行轴回零操作后
             {
+                Log.Write("正在进行X轴销钉轴回零。");
                 var Axis1Result = await motionCard.ReturnOrigin(1);
                 if (Axis1Result.IsSuccess)
                 {
@@ -186,6 +200,7 @@ namespace ToolCollisionCalibration.ViewModels
                     Log.Write("X轴销钉轴回零失败。", LogType.错误);
                     return;
                 }
+                Log.Write("正在进行Y轴定位轴回零。");
                 var Axis2Result = await motionCard.ReturnOrigin(2);
                 if (Axis2Result.IsSuccess)
                 {
@@ -198,19 +213,24 @@ namespace ToolCollisionCalibration.ViewModels
                 }
                 JustStartUp = false;
             }
+            Log.Write("正在进行X轴销钉轴移动到工作位置。");
             motionCard.MoveAbs(1, settingModel.localparams.X_TakePinPosition);
             var AxisIdleResult = await motionCard.ZAux_Direct_GetIfIdle_Continuously(1, 100);
             if(!AxisIdleResult.IsSuccess)
             {
-                Log.Write("X轴回取销钉位置失败。" + AxisIdleResult.ErrMessage, LogType.错误);
+                Log.Write("X轴销钉轴移动到工作位置失败。" + AxisIdleResult.ErrMessage, LogType.错误);
                 return;
             }
+            Log.Write("正在进行Y轴定位轴移动到工作位置。");
             AxisIdleResult = await motionCard.ZAux_Direct_GetIfIdle_Continuously(2, 100);
             if (!AxisIdleResult.IsSuccess)
             {
-                Log.Write("Y轴回初始位置失败。" + AxisIdleResult.ErrMessage, LogType.错误);
+                Log.Write("Y轴定位轴移动到工作位置失败。" + AxisIdleResult.ErrMessage, LogType.错误);
                 return;
             }
+            //固定气缸复位
+            motionCard.ZAux_Direct_SetOp(2, 0);
+            motionCard.ZAux_Direct_SetOp(3, 0);
             _IsettingServer.settingModel.IsReset = true;
         }
 

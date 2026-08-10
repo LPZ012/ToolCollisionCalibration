@@ -25,6 +25,8 @@ namespace ToolCollisionCalibration.ViewModels
             ReturnOriginalCommand = new DelegateCommand<object>(OnReturnOriginal);
             SetPositionCommand = new DelegateCommand<string>(SetAbsPosition);
             AbsMoveCommand = new DelegateCommand<string>(MoveAbs);
+            TurnOffOutPutCommand = new DelegateCommand<object>(TurnOffOutPut);
+            TurnOnOutPutCommand = new DelegateCommand<object>(TurnOnOutPut);
         }
         public ISettingServer settingServer { get; set; }
         /// <summary>
@@ -48,6 +50,17 @@ namespace ToolCollisionCalibration.ViewModels
         /// 绝对运动命令
         /// </summary>
         public DelegateCommand<string> AbsMoveCommand { get; }
+
+        /// <summary>
+        /// 关闭输出命令
+        /// </summary>
+        public DelegateCommand<object> TurnOffOutPutCommand { get; }
+
+        /// <summary>
+        /// 打开输出命令
+        /// </summary>
+        public DelegateCommand<object> TurnOnOutPutCommand { get; }
+
         private MotionCard motionCard => settingServer.motionCard;
         private readonly ILoggers Log;
         
@@ -140,6 +153,26 @@ namespace ToolCollisionCalibration.ViewModels
             int axisNumber = Convert.ToInt32(AxisNumber);
             var ReturnOriginResult =  await Task.Run(() => motionCard.ReturnOrigin(axisNumber));
             if(!ReturnOriginResult.IsSuccess) Log.Write(ReturnOriginResult.ErrMessage, LogType.错误);
+        }
+
+        /// <summary>
+        /// 关闭输出
+        /// </summary>
+        /// <param name="ionum"></param>
+        private void TurnOffOutPut(object ionum)
+        {
+            int IoNum = Convert.ToInt32(ionum);
+            motionCard.ZAux_Direct_SetOp(IoNum, 0);
+        }
+
+        /// <summary>
+        /// 打开输出
+        /// </summary>
+        /// <param name="ionum"></param>
+        private void TurnOnOutPut(object ionum)
+        {
+            int IoNum = Convert.ToInt32(ionum);
+            motionCard.ZAux_Direct_SetOp(IoNum, 1);
         }
 
         public event PropertyChangedEventHandler PropertyChanged;
