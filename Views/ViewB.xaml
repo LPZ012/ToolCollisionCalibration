@@ -11,6 +11,93 @@
              mc:Ignorable="d" 
              d:DesignHeight="650" d:DesignWidth="1000">
     <Grid>
-        
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="Auto"/>
+            <ColumnDefinition Width="Auto"/>
+            <ColumnDefinition/>
+        </Grid.ColumnDefinitions>
+        <StackPanel Orientation="Vertical" HorizontalAlignment="Left">
+            <GroupBox Header="串口配置" Margin="5,5,0,0" FontSize="16" Padding="10">
+                <StackPanel Orientation="Vertical">
+                    <usercontrol:SerialPortControl/>
+                    <usercontrol:SerialPortControl Margin="0,5"/>
+                    <usercontrol:SerialPortControl/>
+                </StackPanel>
+            </GroupBox>
+            <GroupBox Header="本地参数" Margin="5,5,0,0" FontSize="16" Padding="10">
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="85"/>
+                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="85"/>
+                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="85"/>
+                    </Grid.ColumnDefinitions>
+                    <StackPanel Orientation="Vertical">
+                        <TextBlock Text="产品线号" FontSize="16"/>
+                    </StackPanel>
+                    <StackPanel Grid.Column="1" Orientation="Vertical">
+                        <TextBox Text="124.012" Width="70"  TextAlignment="Center" FontSize="15"/>
+                    </StackPanel>
+                    <StackPanel Grid.Column="2" Orientation="Vertical">
+                        <TextBlock Text="机台编号" FontSize="16"/>
+                    </StackPanel>
+                    <StackPanel Grid.Column="3" Orientation="Vertical">
+                        <TextBox Text="124.012" Width="70"  TextAlignment="Center" FontSize="15"/>
+                    </StackPanel>
+                    <StackPanel Grid.Column="4" Orientation="Vertical">
+                        <TextBlock Text="角度系数" FontSize="16"/>
+                    </StackPanel>
+                    <StackPanel Grid.Column="5" Orientation="Vertical">
+                        <TextBox Text="124.012" Width="70"  TextAlignment="Center" FontSize="15"/>
+                    </StackPanel>
+                </Grid>
+            </GroupBox>
+
+        </StackPanel>
+        <StackPanel Grid.Column="1" Orientation="Vertical">
+            <GroupBox Header="产品信息" Margin="5,5,0,0" FontSize="16" Padding="10">
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="260"/>
+                    </Grid.ColumnDefinitions>
+                    <StackPanel Grid.Column="0" Orientation="Vertical">
+                        <TextBlock Text="产品型号" FontSize="16"/>
+                        <TextBlock Text="订单编号" FontSize="16" Margin="0,6"/>
+                    </StackPanel>
+                    <StackPanel Grid.Column="2" Orientation="Vertical">
+                        <TextBox Text="{Binding _IsettingServer.settingModel.DBParams.ProductModel}" Width="230"  TextAlignment="Center" FontSize="15"/>
+                        <TextBox Text="{Binding _IsettingServer.settingModel.DBParams.OrderNum}" Width="230"  TextAlignment="Center" FontSize="15" Margin="0,5"/>
+                    </StackPanel>
+                </Grid>
+            </GroupBox>
+            <GroupBox Header="工艺参数" Margin="5,5,0,0" FontSize="16" Padding="10">
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="260"/>
+                    </Grid.ColumnDefinitions>
+                    <StackPanel Grid.Column="0" Orientation="Vertical">
+                        <TextBlock Text="起始扭矩" FontSize="16"/>
+                        <TextBlock Text="扭矩上限" FontSize="16" Margin="0,6"/>
+                        <TextBlock Text="扭矩下限" FontSize="16"/>
+                        <TextBlock Text="角度上限" FontSize="16" Margin="0,6"/>
+                        <TextBlock Text="角度下限" FontSize="16"/>
+                        <TextBlock Text="反转角度" FontSize="16" Margin="0,6"/>
+                    </StackPanel>
+                    <StackPanel Grid.Column="2" Orientation="Vertical">
+                        <TextBox Text="{Binding _IsettingServer.settingModel.DBParams.ProductModel}" Width="230"  TextAlignment="Center" FontSize="15"/>
+                        <TextBox Text="{Binding _IsettingServer.settingModel.DBParams.OrderNum}" Width="230"  TextAlignment="Center" FontSize="15" Margin="0,5"/>
+                        <TextBox Text="{Binding _IsettingServer.settingModel.DBParams.ProductModel}" Width="230"  TextAlignment="Center" FontSize="15"/>
+                        <TextBox Text="{Binding _IsettingServer.settingModel.DBParams.OrderNum}" Width="230"  TextAlignment="Center" FontSize="15" Margin="0,6"/>
+                        <TextBox Text="{Binding _IsettingServer.settingModel.DBParams.ProductModel}" Width="230"  TextAlignment="Center" FontSize="15"/>
+                        <TextBox Text="{Binding _IsettingServer.settingModel.DBParams.OrderNum}" Width="230"  TextAlignment="Center" FontSize="15" Margin="0,6"/>
+                    </StackPanel>
+                </Grid>
+            </GroupBox>
+
+        </StackPanel>
     </Grid>
 </UserControl>

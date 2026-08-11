@@ -252,7 +252,7 @@
                         <Button Content="倾斜电阻气缸缩回" Command="{Binding TurnOffOutPutCommand}" CommandParameter="4" Height="36" Margin="5" Style="{StaticResource IOButtonStyle}"/>
                         <Button Content="倾斜电阻气缸伸出" Command="{Binding TurnOnOutPutCommand}" CommandParameter="4" Height="36" Margin="5" Style="{StaticResource IOButtonStyle}"/>
                         <Button Content="右固定气缸缩回" Command="{Binding TurnOffOutPutCommand}" CommandParameter="2" Height="36" Margin="5" Style="{StaticResource IOButtonStyle}"/>
-                        <Button Content="右固定气缸伸出" Height="36" Margin="5" Style="{StaticResource IOButtonStyle}"/>
+                        <Button Content="右固定气缸伸出" Command="{Binding TurnOnOutPutCommand}" CommandParameter="2" Height="36" Margin="5" Style="{StaticResource IOButtonStyle}"/>
                         <Button Content="垂直电阻气缸缩回" Command="{Binding TurnOffOutPutCommand}" CommandParameter="5" Height="36" Margin="5" Style="{StaticResource IOButtonStyle}"/>
                         <Button Content="垂直电阻气缸伸出" Command="{Binding TurnOnOutPutCommand}" CommandParameter="5" Height="36" Margin="5" Style="{StaticResource IOButtonStyle}"/>
                         <Button Content="左定位气缸缩回" Height="36" Margin="5" Style="{StaticResource IOButtonStyle}"/>

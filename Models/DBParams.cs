@@ -11,6 +11,7 @@ namespace ToolCollisionCalibration.Models
     {
         public string OrderNum { get; set; }
         public string ProductModel { get; set; }
+        
 
         public event PropertyChangedEventHandler PropertyChanged;
         protected void OnPropertyChanged(string propertyName)
