@@ -31,19 +31,7 @@ namespace ToolCollisionCalibration.Devices
             SetAxisLimitIn(2, 10, 8, 9);
         }
 
-        /// <summary>
-        /// 设置轴的正限位、原点、负限位输入信号
-        /// </summary>
-        /// <param name="iaxis">轴号</param>
-        /// <param name="FwdIn">正限位</param>
-        /// <param name="OriginIn">原点</param>
-        /// <param name="RevIn">负限位</param>
-        private void SetAxisLimitIn(int iaxis, int FwdIn,int DatumIn, int RevIn)
-        {
-            ZAux_Direct_SetFwdIn(iaxis, FwdIn);
-            ZAux_Direct_SetDatumIn(iaxis, DatumIn);
-            ZAux_Direct_SetRevIn(iaxis, RevIn);
-        }
+        
 
         /// <summary>
         /// 点动
@@ -83,12 +71,8 @@ namespace ToolCollisionCalibration.Devices
         /// <param name="AxisNumber">轴号</param>
         public async Task<ResultInfo> ReturnOrigin(int AxisNumber)
         {
-            int OriginIOnum = 0;
-            if (AxisNumber == 1) OriginIOnum = 5;
-            else if (AxisNumber == 2) OriginIOnum = 8;
-            else return new ResultInfo();
             var axisparam = axisParamModels[AxisNumber];
-            return await ReturnOriginal(AxisNumber, axisparam, -9999, OriginIOnum, 3);
+            return await ReturnOriginal(AxisNumber, axisparam, -9999, 5, 3);
         }
     }
 }

@@ -5,7 +5,6 @@ using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Windows;
 using ToolCollisionCalibration.Devices;
-using ToolCollisionCalibration.Models;
 using ToolCollisionCalibration.Servers.Setting;
 using WPFLibrary.Logger;
 using WPFLibrary.Logger.DataGridLog;
@@ -149,8 +148,8 @@ namespace ToolCollisionCalibration.ViewModels
         /// <param name="AxisNumber">轴号</param>
         private async void OnReturnOriginal(object AxisNumber)
         {
-            if (settingServer.settingModel.IsRunning) return;
             int axisNumber = Convert.ToInt32(AxisNumber);
+            if (settingServer.settingModel.IsRunning || axisNumber != 1 || axisNumber != 2) return;
             var ReturnOriginResult =  await Task.Run(() => motionCard.ReturnOrigin(axisNumber));
             if(!ReturnOriginResult.IsSuccess) Log.Write(ReturnOriginResult.ErrMessage, LogType.错误);
         }
