@@ -39,10 +39,8 @@ namespace ToolCollisionCalibration.ViewModels
         /// 测试结果
         /// </summary>
         public string TestResult { get; set; }
-        /// <summary>
-        /// 软件刚启动标志位
-        /// </summary>
-        private bool JustStartUp = true;
+        
+
         /// <summary>
         /// 是否正在复位中
         /// </summary>
@@ -57,11 +55,11 @@ namespace ToolCollisionCalibration.ViewModels
         public event PropertyChangedEventHandler PropertyChanged;
         private DispatcherTimer _refreshTimer;
         private CancellationTokenSource cts = new CancellationTokenSource();
-        private uint[] ListOldSinal = new uint[36];
+        private int[] ListOldSinal = new int[36];
         /// <summary>
         /// 输入口的各个点位状态
         /// </summary>
-		private uint[] inputStatus = new uint[36];
+		private int[] inputStatus = new int[36];
 		public DataBaseModel dataBaseModel { get; set; } = new DataBaseModel();
         private DateTime StartTime;
         public double TestTime { get; set;  }
@@ -90,10 +88,7 @@ namespace ToolCollisionCalibration.ViewModels
         {
             try
             {
-                for (int i = 0; i < 36; i++)
-                {
-                    motionCard.ZAux_Direct_GetIn(i, ref inputStatus[i]);
-                }
+                motionCard.ZAux_Direct_GetInMulti(0, 35, inputStatus);
                 motionCard.ZAux_Direct_GetAllAxisInfo(4, IdleStatus, DposStatus, MposStatus, AxisStatus);
                 for (int i = 0; i < 4; i++)
                 {
@@ -136,10 +131,7 @@ namespace ToolCollisionCalibration.ViewModels
                     }
                     
                 }
-                for (int i = 0; i < 36; i++)
-                {
-                    ListOldSinal[i] = inputStatus[i];
-                }
+                ListOldSinal = inputStatus;
             }
             catch (Exception ex)
             {
@@ -159,26 +151,26 @@ namespace ToolCollisionCalibration.ViewModels
                 if(!IsResetting)
                 {
                     Log.Write("复位中,请勿重复复位。", LogType.提示);
-                    await ResetMachine();
+                    await ResetMachine(false);
                     IsResetting = false;
                 }
             });
             
         }
+        
         /// <summary>
-        /// 轴回到默认位置
+        /// 轴复位等
         /// </summary>
-        private async Task ResetMachine()
+        /// <param name="ManualAuto">手动False自动Ture</param>
+        /// <returns></returns>
+        private async Task ResetMachine(bool ManualAuto)
         {
             _IsettingServer.settingModel.IsReset = false;
 
-            //销钉气缸缩回
-            motionCard.ZAux_Direct_SetOp(1, 0);
-            //左定位气缸
-            //右定位气缸
-            //电阻气缸
-            motionCard.ZAux_Direct_SetOp(4, 0);
-            motionCard.ZAux_Direct_SetOp(5, 0);
+            //所有气缸缩回(除两个固定气缸除外)
+            motionCard.ZAux_Direct_SetOutMulti(0, 1, [0, 0]);
+            motionCard.ZAux_Direct_SetOutMulti(4, 6, [0,0,0]);
+
             await Task.Delay(1000);
             //检查气缸是否缩回到位
             if (inputStatus[18] == 0)
@@ -187,8 +179,11 @@ namespace ToolCollisionCalibration.ViewModels
                 return;
             }
 
-            if (JustStartUp)    //软件刚启动需要进行轴回零操作后
+            if (!ManualAuto)   
             {
+                //灯复位
+                motionCard.ZAux_Direct_SetOutMulti(7, 9, [0, 0, 0]);
+
                 Log.Write("正在进行X轴销钉轴回零。");
                 var Axis1Result = await motionCard.ReturnOrigin(1);
                 if (Axis1Result.IsSuccess)
@@ -211,7 +206,7 @@ namespace ToolCollisionCalibration.ViewModels
                     Log.Write("Y轴定位轴回零失败。", LogType.错误);
                     return;
                 }
-                JustStartUp = false;
+                Log.Write("X轴销钉轴和Y轴定位轴回零完成。");
             }
             Log.Write("正在进行X轴销钉轴移动到工作位置。");
             motionCard.MoveAbs(1, settingModel.localparams.X_TakePinPosition);
@@ -229,8 +224,7 @@ namespace ToolCollisionCalibration.ViewModels
                 return;
             }
             //固定气缸复位
-            motionCard.ZAux_Direct_SetOp(2, 0);
-            motionCard.ZAux_Direct_SetOp(3, 0);
+            motionCard.ZAux_Direct_SetOutMulti(2, 3, [0, 0]);
             _IsettingServer.settingModel.IsReset = true;
         }
 
@@ -244,11 +238,9 @@ namespace ToolCollisionCalibration.ViewModels
             TestResult = "运行中";
             cts = new CancellationTokenSource();
             dataBaseModel = new DataBaseModel();
-            //OK灯复位
-            motionCard.ZAux_Direct_SetOp(7, 0);
-            //NG灯复位
-            motionCard.ZAux_Direct_SetOp(8, 0);
-            //测试灯运行
+            //OK灯复位NG灯复位  测试灯运行
+            motionCard.ZAux_Direct_SetOutMulti(7, 9, [0, 0,1]);
+            
             return true;
         }
         /// <summary>
@@ -256,7 +248,7 @@ namespace ToolCollisionCalibration.ViewModels
         /// </summary>
         private async Task EndInits()
         {
-            await ResetMachine();
+            await ResetMachine(true);
             _IsettingServer.settingModel.IsRunning = false;
         }
         protected void OnPropertyChanged(string propertyName)
@@ -275,6 +267,7 @@ namespace ToolCollisionCalibration.ViewModels
             {
                 try
                 {
+
                 }
                 catch (OperationCanceledException)
                 {
