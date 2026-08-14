@@ -23,21 +23,21 @@ namespace ToolCollisionCalibration.Models
         public string WorkStation { get; set; }
         public string ProdLineNo { get; set; }
         /// <summary>
-        /// X轴取销位置
+        /// 销钉轴初始位置
         /// </summary>
-        public float X_TakePinPosition { get; set; } = 0.00f;
+        public float PinAxis_InitialPosition { get; set; } = 0;
         /// <summary>
-        /// X轴打销位置
+        /// 销钉轴工作位置
         /// </summary>
-        public float X_PinPosition { get; set;} = 0.00f;
+        public float PinAxis_WorkPosition { get; set;} = 0;
         /// <summary>
-        /// Y轴取销位置
+        /// 定位轴初始位置
         /// </summary>
-        public float Y_TakePinPosition { get; set; } = 0.00f;
+        public float LocationAxis_InitialPosition { get; set; } = 0;
         /// <summary>
-        /// Y轴打销位置
+        /// 定位轴工作位置
         /// </summary>
-        public float Y_PinPosition { get; set; } = 0.00f;
+        public float LocationAxis_WorkPosition { get; set; } = 0;
         public SerialPortModel ScannerModel { get; set; }
         public SerialPortModel TorqueModel { get; set; }
         public SerialPortModel AngleModel { get; set; }

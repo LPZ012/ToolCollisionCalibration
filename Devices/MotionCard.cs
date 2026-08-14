@@ -1,12 +1,4 @@
-﻿using HPSocket;
-using Org.BouncyCastle.Asn1.Cms;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using WPFLibrary.Logger;
-using WPFLibrary.Result;
+﻿using WPFLibrary.Result;
 using WPFLibrary.Sockets.TCPIP;
 using WPFLibrary.Zmotion;
 
@@ -27,25 +19,31 @@ namespace ToolCollisionCalibration.Devices
         /// </summary>
         private void Init()
         {
+            //设置限位和原点
             SetAxisLimitIn(1, 7, 5, 6);
             SetAxisLimitIn(2, 10, 8, 9);
         }
 
-        
+        public async Task Reset(int ionum)
+        {
+            ZAux_Direct_SetOp(ionum, 1);
+            await Task.Delay(10);
+            ZAux_Direct_SetOp(ionum, 0);
+        }
 
         /// <summary>
         /// 点动
         /// </summary>
         /// <param name="AxisNumber">轴号</param>
         /// <param name="dir">方向(1为正方向，-1为反方向)</param>
-        public ResultInfo JogMove(int AxisNumber, int dir)
+        public ResultInfo Vmove(int AxisNumber, int dir)
         {
             var axisparam = axisParamModels[AxisNumber];
             return ZAux_Direct_Single_Vmove(AxisNumber, axisparam, dir);
         }
 
         /// <summary>
-        /// 带运动完成信号的绝对运动
+        /// 绝对运动
         /// </summary>
         /// <param name="AxisNumber"></param>
         /// <param name="Position"></param>
@@ -54,6 +52,19 @@ namespace ToolCollisionCalibration.Devices
         {
             var axisparam = axisParamModels[AxisNumber];
             return  ZAux_Direct_Single_MoveAbs(AxisNumber, axisparam, Position);
+        }
+
+        /// <summary>
+        /// 绝对运动(带运动完成标志)
+        /// </summary>
+        /// <param name="AxisNumber"></param>
+        /// <param name="Position"></param>
+        /// <param name="IntervalTime">时间间隔，单位ms</param>
+        /// <returns></returns>
+        public Task<ResultInfo> MoveAbs_DoneStatus(int AxisNumber, float Position,int IntervalTime)
+        {
+            var axisparam = axisParamModels[AxisNumber];
+            return ZAux_Direct_Single_MoveAbs_DoneStatus(AxisNumber, axisparam, Position, IntervalTime);
         }
 
         /// <summary>

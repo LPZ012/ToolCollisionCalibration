@@ -219,19 +219,19 @@
                             <RowDefinition Height="Auto"/>
                         </Grid.RowDefinitions>
                         <StackPanel Grid.Row="0" Orientation="Horizontal">
-                            <Button Grid.Row="0" Command="{Binding SetPositionCommand}" CommandParameter="X_TakePinPositionCommand" Content="X轴取销钉位置标定" Width="130" Height="35" Style="{StaticResource CalButtonStyle}"/>
-                            <TextBlock Text="{Binding settingServer.settingModel.localparams.X_TakePinPosition}" FontSize="13" VerticalAlignment="Center" Margin="10,0,40,0" Width="100" />
-                            <Button Command="{Binding SetPositionCommand}" CommandParameter="Y_TakePinPositionCommand" Content="Y轴取销钉位置标定" Width="130" Height="35" Style="{StaticResource CalButtonStyle}"/>
-                            <TextBlock Text="{Binding settingServer.settingModel.localparams.Y_TakePinPosition}" FontSize="13" VerticalAlignment="Center" Margin="10,0,70,0" Width="100"/>
-                            <Button Grid.Column="2" Command="{Binding AbsMoveCommand}" CommandParameter="X_AbsMoveCommand" Content="X轴绝对运动" Width="130" Height="35" Style="{StaticResource CalButtonStyle}"/>
+                            <Button Grid.Row="0" Command="{Binding SetPositionCommand}" CommandParameter="X_TakePinPositionCommand" Content="销钉轴初始位置标定" Width="135" Height="35" Style="{StaticResource CalButtonStyle}"/>
+                            <TextBlock Text="{Binding settingServer.settingModel.localparams.PinAxis_InitialPosition}" FontSize="13" VerticalAlignment="Center" Margin="10,0,40,0" Width="100" />
+                            <Button Command="{Binding SetPositionCommand}" CommandParameter="Y_TakePinPositionCommand" Content="定位轴初始位置标定" Width="135" Height="35" Style="{StaticResource CalButtonStyle}"/>
+                            <TextBlock Text="{Binding settingServer.settingModel.localparams.LocationAxis_InitialPosition}" FontSize="13" VerticalAlignment="Center" Margin="10,0,70,0" Width="100"/>
+                            <Button Grid.Column="2" Command="{Binding AbsMoveCommand}" CommandParameter="X_AbsMoveCommand" Content="销钉轴绝对运动" Width="135" Height="35" Style="{StaticResource CalButtonStyle}"/>
                             <TextBox Text="{Binding X_AbsMovePostion}" FontSize="13" VerticalAlignment="Center" TextAlignment="Center" Width="100" Margin="10,0,40,0"/>
                         </StackPanel>
                         <StackPanel Grid.Row="1" Orientation="Horizontal" Margin="0,5,0,0">
-                            <Button Command="{Binding SetPositionCommand}" CommandParameter="X_PinPositionCommand" Content="X轴打销钉位置标定" Width="130" Height="35" Style="{StaticResource CalButtonStyle}"/>
-                            <TextBlock Text="{Binding settingServer.settingModel.localparams.X_PinPosition}" FontSize="13" VerticalAlignment="Center" Margin="10,0,40,0" Width="100"/>
-                            <Button Command="{Binding SetPositionCommand}" CommandParameter="Y_PinPositionCommand" Content="Y轴打销钉位置标定" Width="130" Height="35" Style="{StaticResource CalButtonStyle}"/>
-                            <TextBlock Text="{Binding settingServer.settingModel.localparams.Y_PinPosition}" FontSize="13" VerticalAlignment="Center" Margin="10,0,70,0" Width="100"/>
-                            <Button Command="{Binding AbsMoveCommand}" CommandParameter="Y_AbsMoveCommand" Content="Y轴绝对运动" Width="130" Height="35" Style="{StaticResource CalButtonStyle}"/>
+                            <Button Command="{Binding SetPositionCommand}" CommandParameter="X_PinPositionCommand" Content="销钉轴工作位置标定" Width="135" Height="35" Style="{StaticResource CalButtonStyle}"/>
+                            <TextBlock Text="{Binding settingServer.settingModel.localparams.PinAxis_WorkPosition}" FontSize="13" VerticalAlignment="Center" Margin="10,0,40,0" Width="100"/>
+                            <Button Command="{Binding SetPositionCommand}" CommandParameter="Y_PinPositionCommand" Content="定位轴工作位置标定" Width="135" Height="35" Style="{StaticResource CalButtonStyle}"/>
+                            <TextBlock Text="{Binding settingServer.settingModel.localparams.LocationAxis_WorkPosition}" FontSize="13" VerticalAlignment="Center" Margin="10,0,70,0" Width="100"/>
+                            <Button Command="{Binding AbsMoveCommand}" CommandParameter="Y_AbsMoveCommand" Content="定位轴绝对运动" Width="135" Height="35" Style="{StaticResource CalButtonStyle}"/>
                             <TextBox Text="{Binding Y_AbsMovePostion}" FontSize="13" VerticalAlignment="Center" TextAlignment="Center" Width="100" Margin="10,0,40,0"/>
 
                         </StackPanel>
@@ -257,13 +257,13 @@
                         <Button Content="垂直电阻气缸伸出" Command="{Binding TurnOnOutPutCommand}" CommandParameter="5" Height="36" Margin="5" Style="{StaticResource IOButtonStyle}"/>
                         <Button Content="左定位气缸缩回" Command="{Binding TurnOffOutPutCommand}" CommandParameter="6" Height="36" Margin="5" Style="{StaticResource IOButtonStyle}"/>
                         <Button Content="左定位气缸伸出" Command="{Binding TurnOnOutPutCommand}" CommandParameter="6" Height="36" Margin="5" Style="{StaticResource IOButtonStyle}"/>
-                        <Button Content="备用" Height="36" Margin="5" Style="{StaticResource IOButtonStyle}"/>
-                        <Button Content="备用" Height="36" Margin="5" Style="{StaticResource IOButtonStyle}"/>
+                        <Button Content="伺服断使能" Command="{Binding TurnOffOutPutCommand}" CommandParameter="10" Height="36" Margin="5" Style="{StaticResource IOButtonStyle}"/>
+                        <Button Content="伺服上使能" Command="{Binding TurnOnOutPutCommand}" CommandParameter="10"  Height="36" Margin="5" Style="{StaticResource IOButtonStyle}"/>
                         <Button Content="右定位气缸缩回" Command="{Binding TurnOffOutPutCommand}" CommandParameter="0" Height="36" Margin="5" Style="{StaticResource IOButtonStyle}"/>
                         <Button Content="右定位气缸伸出" Command="{Binding TurnOnOutPutCommand}" CommandParameter="0" Height="36" Margin="5" Style="{StaticResource IOButtonStyle}"/>
-                        <Button Content="备用" Height="36" Margin="5" Style="{StaticResource IOButtonStyle}"/>
-                        <Button Content="备用" Height="36" Margin="5" Style="{StaticResource IOButtonStyle}"/>
-                        <Button Content="备用" Height="36" Margin="5" Style="{StaticResource IOButtonStyle}"/>
+                        <Button Content="真空阀断气" Command="{Binding TurnOffOutPutCommand}" CommandParameter="11" Height="36" Margin="5" Style="{StaticResource IOButtonStyle}"/>
+                        <Button Content="真空阀供气" Command="{Binding TurnOnOutPutCommand}" CommandParameter="11" Height="36" Margin="5" Style="{StaticResource IOButtonStyle}"/>
+                        <Button Content="伺服复位" Command="{Binding ServoResetCommand}" CommandParameter="9" Height="36" Margin="5" Style="{StaticResource IOButtonStyle}"/>
                         <Button Content="保存参数" Command="{Binding SaveParamsCommand}" Height="36" Margin="5" Style="{StaticResource IOButtonStyle}"/>
                     </ItemsControl>
                 </GroupBox>

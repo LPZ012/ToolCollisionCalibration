@@ -26,6 +26,7 @@ namespace ToolCollisionCalibration.ViewModels
             AbsMoveCommand = new DelegateCommand<string>(MoveAbs);
             TurnOffOutPutCommand = new DelegateCommand<object>(TurnOffOutPut);
             TurnOnOutPutCommand = new DelegateCommand<object>(TurnOnOutPut);
+            ServoResetCommand = new DelegateCommand<object>(ServoReset);
         }
         public ISettingServer settingServer { get; set; }
         /// <summary>
@@ -60,9 +61,25 @@ namespace ToolCollisionCalibration.ViewModels
         /// </summary>
         public DelegateCommand<object> TurnOnOutPutCommand { get; }
 
+        /// <summary>
+        /// 伺服复位
+        /// </summary>
+        public DelegateCommand<object> ServoResetCommand { get; }
+
         private MotionCard motionCard => settingServer.motionCard;
         private readonly ILoggers Log;
         
+
+        /// <summary>
+        /// 伺服复位
+        /// </summary>
+        /// <param name="IoNum"></param>
+        private async void ServoReset(object IoNum)
+        {
+            int ionum = Convert.ToInt32(IoNum);
+            await motionCard.Reset(ionum);
+        }
+
         /// <summary>
         /// 标定取销钉和打销钉位置
         /// </summary>
@@ -72,16 +89,16 @@ namespace ToolCollisionCalibration.ViewModels
             switch(Command)
             {
                 case "X_TakePinPositionCommand":
-                    settingServer.settingModel.localparams.X_TakePinPosition = settingServer.settingModel.AxisItems[1].Mpos;
+                    settingServer.settingModel.localparams.PinAxis_InitialPosition = settingServer.settingModel.AxisItems[1].Mpos;
                     break;
                 case "X_PinPositionCommand":
-                    settingServer.settingModel.localparams.X_PinPosition = settingServer.settingModel.AxisItems[1].Mpos;
+                    settingServer.settingModel.localparams.PinAxis_WorkPosition = settingServer.settingModel.AxisItems[1].Mpos;
                     break;
                 case "Y_TakePinPositionCommand":
-                    settingServer.settingModel.localparams.Y_TakePinPosition = settingServer.settingModel.AxisItems[2].Mpos;
+                    settingServer.settingModel.localparams.LocationAxis_InitialPosition = settingServer.settingModel.AxisItems[2].Mpos;
                     break;
                 case "Y_PinPositionCommand":
-                    settingServer.settingModel.localparams.Y_PinPosition = settingServer.settingModel.AxisItems[2].Mpos;
+                    settingServer.settingModel.localparams.LocationAxis_WorkPosition = settingServer.settingModel.AxisItems[2].Mpos;
                     break;
             }
         }
@@ -114,7 +131,7 @@ namespace ToolCollisionCalibration.ViewModels
         {
             if (settingServer.settingModel.IsRunning) return;
             int axisNumber = Convert.ToInt32(AxisNumber);
-            var JogForwardMoveResult = motionCard.JogMove(axisNumber, 1);
+            var JogForwardMoveResult = motionCard.Vmove(axisNumber, 1);
             if (!JogForwardMoveResult.IsSuccess) Log.Write(JogForwardMoveResult.ErrMessage, LogType.错误);
         }
 
@@ -126,7 +143,7 @@ namespace ToolCollisionCalibration.ViewModels
         {
             if (settingServer.settingModel.IsRunning) return;
             int axisNumber = Convert.ToInt32(AxisNumber);
-            var JogReverseMoveResult =  motionCard.JogMove(axisNumber, -1);
+            var JogReverseMoveResult =  motionCard.Vmove(axisNumber, -1);
             if (!JogReverseMoveResult.IsSuccess) Log.Write(JogReverseMoveResult.ErrMessage, LogType.错误);
         }
 
