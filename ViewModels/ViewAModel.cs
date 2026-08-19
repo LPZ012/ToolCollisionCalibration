@@ -201,7 +201,7 @@ namespace ToolCollisionCalibration.ViewModels
                     Log.Write("销钉轴回零失败。", LogType.错误);
                     return;
                 }
-                Log.Write("正在进行定位轴回零。");
+                Log.Write("销钉轴回零成功，正在进行定位轴回零。");
                 var Axis2Result = await motionCard.ReturnOrigin(2);
                 if (Axis2Result.IsSuccess)
                 {
@@ -218,6 +218,7 @@ namespace ToolCollisionCalibration.ViewModels
             //固定气缸复位
             motionCard.ZAux_Direct_SetOutMulti(2, 3, [0, 0]);
             _IsettingServer.settingModel.IsReset = true;
+            if (!ManualAuto) Log.Write("复位成功。");
         }
 
         /// <summary>
@@ -240,8 +241,8 @@ namespace ToolCollisionCalibration.ViewModels
                 Log.Write("销钉轴移动到初始位置失败。" + MoveAbsResult.ErrMessage, LogType.错误);
                 return false;
             }
-
-            Log.Write("正在进行定位轴移动到初始位置。");
+            
+            Log.Write("销钉轴移动到初始位置成功，正在进行定位轴移动到初始位置。");
 
             MoveAbsResult = await motionCard.MoveAbs_DoneStatus(2, settingModel.localparams.LocationAxis_InitialPosition, 50);
             if (!MoveAbsResult.IsSuccess)
@@ -274,6 +275,7 @@ namespace ToolCollisionCalibration.ViewModels
             if (!await AxisMoveToInitialPosition()) return false;
             //扭矩、角度传感器初始化
 
+            //扫码
 
             angleDevice.SetDirection(false);
             await Task.Delay(50,cts.Token);

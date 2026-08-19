@@ -8,7 +8,7 @@
     <UseWPF>true</UseWPF>
     <ApplicationIcon>纸飞机_128x128.ico</ApplicationIcon>
     <Platforms>AnyCPU;x64</Platforms>
-    <AssemblyVersion>2026.8.14.132</AssemblyVersion>
+    <AssemblyVersion>2026.8.19.134</AssemblyVersion>
   </PropertyGroup>
 
   <ItemGroup>
