@@ -1,3 +1,4 @@
+using DryIoc.ImTools;
 using Newtonsoft.Json.Linq;
 using Org.BouncyCastle.Tsp;
 using System.Collections.ObjectModel;
@@ -60,11 +61,11 @@ namespace ToolCollisionCalibration.ViewModels
         public event PropertyChangedEventHandler PropertyChanged;
         private DispatcherTimer _refreshTimer;
         private CancellationTokenSource cts = new CancellationTokenSource();
-        private int[] ListOldSinal = new int[36];
+        private char[] ListOldSinal = new char[32];
         /// <summary>
         /// 输入口的各个点位状态
         /// </summary>
-		private int[] inputStatus = new int[36];
+		private char[] inputStatus = new char[32];
 		public DataBaseModel dataBaseModel { get; set; } = new DataBaseModel();
         private DateTime StartTime;
         public double TestTime { get; set;  }
@@ -102,12 +103,12 @@ namespace ToolCollisionCalibration.ViewModels
                     _IsettingServer.settingModel.AxisItems[i].Mpos = MposStatus[i];
                     _IsettingServer.settingModel.AxisItems[i].Status = AxisStatus[i];
                 }
-                if (inputStatus[3] == 1 && ListOldSinal[3] == 0)
+                if (inputStatus[3] == '1' && ListOldSinal[3] == '0')
                 {
                     Reset();
                 }
                 //停止加光栅
-                if (inputStatus[4] == 0 || inputStatus[13] == 0)
+                if (inputStatus[4] == '0' || inputStatus[13] == '0')
                 {
                     //轴运动立即停止
                     motionCard.ZAux_Direct_CancelAxisList(4, new int[] { 0, 1, 2, 3 }, 2);
@@ -116,9 +117,9 @@ namespace ToolCollisionCalibration.ViewModels
                     _IsettingServer.settingModel.IsReset = false;
                 }
                 ///判断上升沿启动
-                if (inputStatus[12] == 1 && ListOldSinal[12] == 0 && inputStatus[11] == 1 && ListOldSinal[11] == 0 && inputStatus[4] == 1 && inputStatus[13] == 1 && !_IsettingServer.settingModel.IsRunning)
+                if (inputStatus[12] == '1' && ListOldSinal[12] == '0' && inputStatus[11] == '1' && ListOldSinal[11] == '0' && inputStatus[4] == '1' && inputStatus[13] == '1' && !_IsettingServer.settingModel.IsRunning)
                 {
-                    if (inputStatus[0] == 1)
+                    if (inputStatus[0] == '1')
                     {
                         if (_IsettingServer.settingModel.IsReset)
                         {
@@ -136,7 +137,7 @@ namespace ToolCollisionCalibration.ViewModels
                     }
                     
                 }
-                ListOldSinal = inputStatus;
+                ListOldSinal = inputStatus.Copy();
             }
             catch (Exception ex)
             {

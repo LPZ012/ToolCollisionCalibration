@@ -166,7 +166,7 @@ namespace ToolCollisionCalibration.ViewModels
         private async void OnReturnOriginal(object AxisNumber)
         {
             int axisNumber = Convert.ToInt32(AxisNumber);
-            if (settingServer.settingModel.IsRunning || axisNumber != 1 || axisNumber != 2) return;
+            if (settingServer.settingModel.IsRunning && axisNumber != 1 && axisNumber != 2) return;
             var ReturnOriginResult =  await Task.Run(() => motionCard.ReturnOrigin(axisNumber));
             if(!ReturnOriginResult.IsSuccess) Log.Write(ReturnOriginResult.ErrMessage, LogType.错误);
         }
