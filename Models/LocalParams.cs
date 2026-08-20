@@ -38,6 +38,12 @@ namespace ToolCollisionCalibration.Models
         /// 定位轴工作位置
         /// </summary>
         public float LocationAxis_WorkPosition { get; set; } = 0;
+
+        /// <summary>
+        /// 角度系数
+        /// </summary>
+        public float AngleCoefficient { get; set; } = 1;
+
         public SerialPortModel ScannerModel { get; set; }
         public SerialPortModel TorqueModel { get; set; }
         public SerialPortModel AngleModel { get; set; }

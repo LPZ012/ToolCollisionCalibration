@@ -32,7 +32,7 @@ public partial class App
             Environment.Exit(1);
             return;
         }
-        //containerRegistry.RegisterSingleton<ISqlClient>(() => new SqlClient("Data Source=172.19.0.125;Initial Catalog=ES300;User ID=kwdevB;Password=uMo8!#CvaB;TrustServerCertificate=True"));
+        containerRegistry.RegisterSingleton<ISqlClient>(() => new SqlClient("Data Source=172.19.0.125;Initial Catalog=ES300;User ID=kwdevB;Password=uMo8!#CvaB;TrustServerCertificate=True"));
         containerRegistry.RegisterSingleton<IDataGridLogHelper>(() => new DataGridLogHelper(FilePath.LogFolder));
         containerRegistry.RegisterSingleton<ISettingServer,SettingServer>();
         containerRegistry.RegisterForNavigation<MainView, MainViewModel>();

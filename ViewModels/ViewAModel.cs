@@ -20,17 +20,20 @@ namespace ToolCollisionCalibration.ViewModels
 {
     public class ViewAModel:INotifyPropertyChanged
     {
-        public ViewAModel(IEventAggregator eventAggregator, ISettingServer isettingServer, IDataGridLogHelper Log)
+        public ViewAModel(IEventAggregator eventAggregator, ISettingServer isettingServer, IDataGridLogHelper Log,ISqlClient sqlClient)
         {
             _IsettingServer = isettingServer;
             this.Log = Log;
+            this.sqlClient = sqlClient;
             eventAggregator.GetEvent<ViewBToViewAServer>().Subscribe(ViewBToViewAEvent);
             Points.CollectionChanged += (s, e) => UpdateStatus();
             UpdateStatus();
             InitializeTimer();
-
         }
+
+
         ///////////////////////////////设备/////////////////////////////////////////
+        private readonly ISqlClient sqlClient;
         MotionCard motionCard => _IsettingServer.motionCard;
         IAngleDevice<double> angleDevice => _IsettingServer.AngleDevice;
         ITorqueDevice<double> torqueDevice => _IsettingServer.TorqueDevice;
@@ -228,14 +231,6 @@ namespace ToolCollisionCalibration.ViewModels
         private async Task<bool> AxisMoveToInitialPosition()
         {
             Log.Write("正在进行销钉轴移动到初始位置。");
-            //motionCard.MoveAbs(1, settingModel.localparams.PinAxis_InitialPosition);
-            //var AxisIdleResult = await motionCard.ZAux_Direct_GetIfIdle_Continuously(1, 100);
-            //if (!AxisIdleResult.IsSuccess)
-            //{
-            //    Log.Write("销钉轴移动到初始位置失败。" + AxisIdleResult.ErrMessage, LogType.错误);
-            //    return false;
-            //}
-
             var MoveAbsResult = await  motionCard.MoveAbs_DoneStatus(1, settingModel.localparams.PinAxis_InitialPosition, 50);
             if(!MoveAbsResult.IsSuccess)
             {
@@ -251,12 +246,6 @@ namespace ToolCollisionCalibration.ViewModels
                 Log.Write("定位轴移动到初始位置失败。" + MoveAbsResult.ErrMessage, LogType.错误);
                 return false;
             }
-            //AxisIdleResult = await motionCard.ZAux_Direct_GetIfIdle_Continuously(2, 100);
-            //if (!AxisIdleResult.IsSuccess)
-            //{
-            //    Log.Write("定位轴移动到初始位置失败。" + AxisIdleResult.ErrMessage, LogType.错误);
-            //    return false;
-            //}
             Log.Write("销钉轴和定位轴移动到初始位置完成。");
             return true;
         }
@@ -277,6 +266,40 @@ namespace ToolCollisionCalibration.ViewModels
             //扭矩、角度传感器初始化
 
             //扫码
+            while (settingModel.localparams.ScanEnable)
+            {
+                var ScanResult = await Scanner.ReadBarcodeAsync(100);
+                if (!ScanResult.IsSuccess || !ScanResult.Result[0].Contains("m="))
+                {
+                    Log.Write(ScanResult.ErrMessage + "  未扫上二维码，重试中...", LogType.错误);
+                    await Task.Delay(3000, cts.Token);
+                    continue;
+                }
+                string BarCode = ScanResult.Result[0].Replace("\r", "");
+                Log.Write($"扫码成功: {BarCode}");
+                string[] SN_Code = new string[3];
+                string[] StrSplit = { "m=", "&s=" };
+                SN_Code = BarCode.Trim().Split(StrSplit, StringSplitOptions.RemoveEmptyEntries);
+                dataBaseModel.SN_Code = SN_Code[2];
+                dataBaseModel.ProductModel = SN_Code[1];
+                dataBaseModel.ProdLineNo = SN_Code[2].Substring(6, 2);
+                dataBaseModel.OrderNum = settingModel.DBParams.OrderNum;
+                dataBaseModel.WorkStation = settingModel.localparams.WorkStation;
+                break;
+            }
+            if (settingModel.localparams.DebugEnable)
+            {
+                if (!dataBaseModel.ProdLineNo.Equals(settingModel.localparams.ProdLineNo))
+                {
+                    Log.Write("非本线产品不允许运行！", LogType.提示);
+                    return false;
+                }
+                if (!sqlClient.IsConnected)
+                {
+                    Log.Write("与数据库连接异常！", LogType.错误);
+                    return false;
+                }
+            }
 
             angleDevice.SetDirection(false);
             await Task.Delay(50,cts.Token);
@@ -294,7 +317,7 @@ namespace ToolCollisionCalibration.ViewModels
             var MoveAbsResult = await motionCard.MoveAbs_DoneStatus(2, settingModel.localparams.LocationAxis_WorkPosition, 50);
             if (!MoveAbsResult.IsSuccess)
             {
-                Log.Write("定位轴移动到初始位置失败。" + MoveAbsResult.ErrMessage, LogType.错误);
+                Log.Write("定位轴移动到工作位置失败。" + MoveAbsResult.ErrMessage, LogType.错误);
                 return;
             }
             //定位气缸动作
@@ -302,23 +325,51 @@ namespace ToolCollisionCalibration.ViewModels
             motionCard.ZAux_Direct_SetOp(0, 1);
 
             //等待气缸动作完成
-            await Task.Delay(500,cts.Token);
+            await Task.Delay(2000,cts.Token);
             //Z轴开始运行
             motionCard.Vmove(3, 1);
-            while(true)
+            //模拟使用
+            DateTime dateTime = DateTime.Now;
+            while((DateTime.Now - dateTime).TotalSeconds < 15)
             {
-                var torqueresult = await  torqueDevice.ReadTorque(50, 1);
-                if(torqueresult.IsSuccess)
-                {
-                    deviceValueModel.RealTorque = torqueresult.Result[0];
-                }
+                //var torqueresult = await  torqueDevice.ReadTorque(50, 1);
+                //if(torqueresult.IsSuccess)
+                //{
+                //    deviceValueModel.RealTorque = torqueresult.Result[0];
+                //}
                 var angleresult = await angleDevice.ReadAngle(50, 1);
                 if(angleresult.IsSuccess)
                 {
                     deviceValueModel.RealAngle = angleresult.Result[0];
                 }
+                await Task.Delay(50,cts.Token);
             }
 
+            //模拟测试逻辑结束
+
+            //Z轴停止
+            motionCard.AxisStop(3);
+
+            //左右固定气缸复位
+            motionCard.ZAux_Direct_SetOp(6, 0);
+            motionCard.ZAux_Direct_SetOp(0, 0);
+
+            //取销钉
+            motionCard.ZAux_Direct_SetOp(1, 1);
+            await Task.Delay(1000,cts.Token);
+            motionCard.ZAux_Direct_SetOp(1, 0);
+            await Task.Delay(1000, cts.Token);
+            //销钉轴运动到工作位置
+            var MoveResult = await motionCard.MoveAbs_DoneStatus(1, settingModel.localparams.PinAxis_WorkPosition, 50);
+            if(!MoveResult.IsSuccess)
+            {
+                Log.Write("销钉轴移动到工作位置失败。" + MoveAbsResult.ErrMessage, LogType.错误);
+                return;
+            }
+            //开始打销钉
+            motionCard.ZAux_Direct_SetOp(1, 1);
+            await Task.Delay(1000, cts.Token);
+            //测试完成，进行复位操作
         }
 
         /// <summary>

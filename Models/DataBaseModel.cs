@@ -44,32 +44,34 @@ namespace ToolCollisionCalibration.Models
         
 
         [Name("起始角度")]
-        public float StartAngle { get; set; }
+        public string StartingAngle { get; set; }
 
         
         [Name("结束角度")]
-        public float EndAngle { get; set; }
+        public string EndAngle { get; set; }
 
         
         [Name("角度差")]
-        public float AngleDifference { get; set; }
+        public string AngleDifference { get; set; }
 
-        
+        [Name("反转角度")]
+        public string InvertAngleCompensation { get; set; }
+
         [Name("起始扭矩")]
-        public float StartTorque { get; set; }
+        public string StartingTorque { get; set; }
 
         
         [Name("结束扭矩")]
-        public float EndTorque { get; set; }
+        public string EndTorque { get; set; }
 
         
         [Name("扭矩差")]
-        public float TorqueDifference { get; set; }
+        public string TorqueDifference { get; set; }
 
         // --- INotifyPropertyChanged 实现 ---
         public event PropertyChangedEventHandler PropertyChanged;
 
-        protected void OnPropertyChanged([CallerMemberName] string propertyName = null)
+        protected void OnPropertyChanged(string propertyName)
         {
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }

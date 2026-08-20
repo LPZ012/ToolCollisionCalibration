@@ -15,10 +15,16 @@
                     <RowDefinition Height="Auto"/>
                     <RowDefinition Height="*"/>
                     <RowDefinition Height="100"/>
-                    <RowDefinition Height="100"/>
+                    <RowDefinition Height="200"/>
                 </Grid.RowDefinitions>
                 <Label Content="角度与扭矩笛卡尔坐标" HorizontalAlignment="Center"/>
-                <chart:ChartCanvas Grid.Row="1"
+                <Grid Grid.Row="1">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="500"/>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
+                    <chart:ChartCanvas
                            Points="{Binding Points, Mode=OneWay}"
                            XMin="{Binding XMin, Mode=OneWay}"
                            XMax="{Binding XMax, Mode=OneWay}"
@@ -28,7 +34,22 @@
                            YAxisTitle="角度"
                            Background="White"
                            Margin="10,6,10,6"/>
-                <DataGrid Grid.Row="3" x:Name="LogDataGrid" IsReadOnly="True" AutoGenerateColumns="False" CanUserAddRows="False" CanUserSortColumns="False" FontSize="20">
+                    <StackPanel Orientation="Vertical" Grid.Column="1">
+                        <StackPanel Orientation="Horizontal" Margin="0,5,0,0">
+                            <TextBlock Text="机二维码" FontSize="16"/>
+                            <TextBox Text="{Binding dataBaseModel.SN_Code}" Width="170" FontSize="15" IsReadOnly="True" TextAlignment="Center" Margin="5,0,10,0"/>
+                        </StackPanel>
+                        <StackPanel Orientation="Horizontal" Margin="0,5,0,0">
+                            <TextBlock Text="产品型号" FontSize="16"/>
+                            <TextBox Text="{Binding dataBaseModel.ProductModel}" Width="170" FontSize="16" IsReadOnly="True" TextAlignment="Center" Margin="5,0,0,0"/>
+                        </StackPanel>
+                        <StackPanel Orientation="Horizontal" Margin="0,5,0,0">
+                            <TextBlock Text="当前角度" FontSize="16"/>
+                            <TextBox Text="{Binding deviceValueModel.RealAngle}" Width="170" FontSize="16" IsReadOnly="True" TextAlignment="Center" Margin="5,0,0,0"/>
+                        </StackPanel>
+                    </StackPanel>
+                </Grid>
+                <DataGrid Grid.Row="3" x:Name="LogDataGrid" IsReadOnly="True" AutoGenerateColumns="False" CanUserAddRows="False" CanUserSortColumns="False" FontSize="15">
                     <DataGrid.Columns>
                         <DataGridTextColumn Header="时间" Binding="{Binding Time}"/>
                         <DataGridTextColumn Header="类型">

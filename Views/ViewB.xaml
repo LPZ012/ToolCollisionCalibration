@@ -19,9 +19,9 @@
         <StackPanel Orientation="Vertical" HorizontalAlignment="Left">
             <GroupBox Header="串口配置" Margin="5,5,0,0" FontSize="16" Padding="10">
                 <StackPanel Orientation="Vertical">
-                    <usercontrol:SerialPortControl/>
-                    <usercontrol:SerialPortControl Margin="0,5"/>
-                    <usercontrol:SerialPortControl/>
+                    <usercontrol:SerialPortControl SerialPortModel="{Binding _IsettingServer.settingModel.localparams.ScannerModel}"/>
+                    <usercontrol:SerialPortControl SerialPortModel="{Binding _IsettingServer.settingModel.localparams.TorqueModel}" Margin="0,10"/>
+                    <usercontrol:SerialPortControl SerialPortModel="{Binding _IsettingServer.settingModel.localparams.AngleModel}"/>
                 </StackPanel>
             </GroupBox>
             <GroupBox Header="本地参数" Margin="5,5,0,0" FontSize="16" Padding="10">
@@ -38,23 +38,42 @@
                         <TextBlock Text="产品线号" FontSize="16"/>
                     </StackPanel>
                     <StackPanel Grid.Column="1" Orientation="Vertical">
-                        <TextBox Text="124.012" Width="70"  TextAlignment="Center" FontSize="15"/>
+                        <TextBox Text="{Binding _IsettingServer.settingModel.localparams.ProdLineNo}" Width="70"  TextAlignment="Center" FontSize="15"/>
                     </StackPanel>
                     <StackPanel Grid.Column="2" Orientation="Vertical">
                         <TextBlock Text="机台编号" FontSize="16"/>
                     </StackPanel>
                     <StackPanel Grid.Column="3" Orientation="Vertical">
-                        <TextBox Text="124.012" Width="70"  TextAlignment="Center" FontSize="15"/>
+                        <TextBox Text="{Binding _IsettingServer.settingModel.localparams.WorkStation}" Width="70"  TextAlignment="Center" FontSize="15"/>
                     </StackPanel>
                     <StackPanel Grid.Column="4" Orientation="Vertical">
                         <TextBlock Text="角度系数" FontSize="16"/>
                     </StackPanel>
                     <StackPanel Grid.Column="5" Orientation="Vertical">
-                        <TextBox Text="124.012" Width="70"  TextAlignment="Center" FontSize="15"/>
+                        <TextBox Text="{Binding _IsettingServer.settingModel.localparams.AngleCoefficient}" Width="70"  TextAlignment="Center" FontSize="15"/>
                     </StackPanel>
                 </Grid>
             </GroupBox>
 
+            <StackPanel Orientation="Horizontal" Margin="60,10" >
+                <StackPanel Orientation="Horizontal">
+                    <TextBlock Text="关闭/启用扫码" FontSize="16"/>
+                    <customcontrol:SwitchButton IsChecked="{Binding _IsettingServer.settingModel.localparams.ScanEnable,Mode=TwoWay}" Width="60" Height="20" CornerRadius="15" EllipseWidth="19" EllipseHeight="19" Margin="5,0,0,0"/>
+                </StackPanel>
+                <StackPanel Orientation="Horizontal" Margin="10,0,0,0">
+                    <TextBlock Text="调试/正常模式" FontSize="16"/>
+                    <customcontrol:SwitchButton IsChecked="{Binding _IsettingServer.settingModel.localparams.DebugEnable,Mode=TwoWay}" Width="60" Height="20" CornerRadius="15" EllipseWidth="19" EllipseHeight="19" Margin="5,0,0,0"/>
+                </StackPanel>
+            </StackPanel>
+
+
+
+            <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Margin="0,10,0,0">
+                <Button Content="保存参数" Command="{Binding SaveParamsCommand}" FontSize="20" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                <Button Content="加载型号" Command="{Binding LoadModelCommand}" FontSize="20" HorizontalAlignment="Center" VerticalAlignment="Center" Margin="10,0"/>
+                <Button Content="下发参数" Command="{Binding UpDateParamsCommand}" FontSize="20" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                <Button Content="获取参数" Command="{Binding GetParamsCommand}" FontSize="20" HorizontalAlignment="Center" VerticalAlignment="Center" Margin="10,0"/>
+            </StackPanel>
         </StackPanel>
         <StackPanel Grid.Column="1" Orientation="Vertical">
             <GroupBox Header="产品信息" Margin="5,5,0,0" FontSize="16" Padding="10">
@@ -73,7 +92,7 @@
                     </StackPanel>
                 </Grid>
             </GroupBox>
-            <GroupBox Header="工艺参数" Margin="5,5,0,0" FontSize="16" Padding="10">
+            <!--<GroupBox Header="工艺参数" Margin="5,5,0,0" FontSize="16" Padding="10">
                 <Grid>
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="Auto"/>
@@ -96,7 +115,7 @@
                         <TextBox Text="{Binding _IsettingServer.settingModel.DBParams.OrderNum}" Width="230"  TextAlignment="Center" FontSize="15" Margin="0,6"/>
                     </StackPanel>
                 </Grid>
-            </GroupBox>
+            </GroupBox>-->
 
         </StackPanel>
     </Grid>

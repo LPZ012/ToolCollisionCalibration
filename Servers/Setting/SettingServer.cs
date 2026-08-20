@@ -18,13 +18,14 @@ namespace ToolCollisionCalibration.Servers.Setting
     /// </summary>
     public class SettingServer : ISettingServer
     {
-        public SettingServer()
+        public SettingServer(ISqlClient sqlClient)
         {
+            _SqlClient = sqlClient;
             LoadSettingAsync();
             InitDevices();
         }
         public SettingModel settingModel { get; set; } = new SettingModel();
-        
+        private readonly ISqlClient _SqlClient;
         public IScanner<byte[]> Scanner { get; set; }
         public ITorqueDevice<double> TorqueDevice { get; set; }
         public MotionCard motionCard { get; set; }
@@ -78,11 +79,11 @@ namespace ToolCollisionCalibration.Servers.Setting
         {
             try
             {
-                //if (string.IsNullOrEmpty(settingModel.DBParams.ProductModel)) 
-                //{
-                //    MessageBox.Show("型号不能为空", "提示", MessageBoxButton.OK, MessageBoxImage.Warning);
-                //    return false;
-                //}
+                if (string.IsNullOrEmpty(settingModel.DBParams.ProductModel))
+                {
+                    MessageBox.Show("型号不能为空", "提示", MessageBoxButton.OK, MessageBoxImage.Warning);
+                    return false;
+                }
                 bool result = JsonHelper.WriteJson<LocalParams>(FilePath.ParameterFolder, FilePath.ParameterJsonFileName, settingModel.localparams);
                 string modeljsonfilmname = FilePath.DBParamFolder + $@"\{settingModel.DBParams.ProductModel}.json";
                 result &= JsonHelper.WriteJson<DBParams>(FilePath.DBParamFolder, modeljsonfilmname, settingModel.DBParams);
@@ -90,7 +91,7 @@ namespace ToolCollisionCalibration.Servers.Setting
                 {
                     MessageBox.Show("写入本地配置文件失败","错误",MessageBoxButton.OK,MessageBoxImage.Error);
                 }
-                UpdateMainView();
+                //UpdateMainView();
                 return result;
             }
             catch (Exception ex)
@@ -105,30 +106,30 @@ namespace ToolCollisionCalibration.Servers.Setting
         /// </summary>
         public void InitDevices()
         {
-            //Scanner = new ScanHome(settingModel.localparams.ScannerModel);
-            //AngleDevice = new OID_R2_3806D_15S1S(settingModel.localparams.AngleModel,32768);
+            Scanner = new ScanHome(settingModel.localparams.ScannerModel);
+            //缺少扭矩实例
+            AngleDevice = new OID_R2_3806D_15S1S(settingModel.localparams.AngleModel, 32768);
             motionCard = new MotionCard(new WPFLibrary.Sockets.TCPIP.TCPIPModel("192.168.0.11",1000,"motionCard"),settingModel.localparams.AxisParamModels);
         }
 
         public bool GetParamsFromDB()
         {
-            //try
-            //{
-            //    DBParams dBParams = _SqlClient.GetParameters(settingModel.localparams.ProdLineNo);
-            //    if (dBParams == null)
-            //    {
-            //        MessageBox.Show("从数据库获取参数失败。", "错误", MessageBoxButton.OK, MessageBoxImage.Error);
-            //        return false;
-            //    }
-            //    ResetParams(dBParams);
-            //    return true;
-            //}
-            //catch (Exception ex)
-            //{
-            //   MessageBox.Show($"从数据库获取参数失败，异常信息：{ex}", "错误", MessageBoxButton.OK, MessageBoxImage.Error);
-            //    return false;
-            //}
-            return true;
+            try
+            {
+                DBParams dBParams = _SqlClient.GetParameters(settingModel.localparams.ProdLineNo);
+                if (dBParams == null)
+                {
+                    MessageBox.Show("从数据库获取参数失败。", "错误", MessageBoxButton.OK, MessageBoxImage.Error);
+                    return false;
+                }
+                ResetParams(dBParams);
+                return true;
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"从数据库获取参数失败，异常信息：{ex}", "错误", MessageBoxButton.OK, MessageBoxImage.Error);
+                return false;
+            }
 
         }
         public void ResetParams(DBParams dBParams)
@@ -143,16 +144,16 @@ namespace ToolCollisionCalibration.Servers.Setting
 
         public void UpDateParamsToDB()
         {
-            //bool result = _SqlClient.UpDateParameters(settingModel.DBParams, settingModel.localparams.ProdLineNo);
-            //if (result)
-            //{
-            //    MessageBox.Show("下发参数成功", "消息", MessageBoxButton.OK, MessageBoxImage.Information);
+            bool result = _SqlClient.UpDateParameters(settingModel.DBParams, settingModel.localparams.ProdLineNo);
+            if (result)
+            {
+                MessageBox.Show("下发参数成功", "消息", MessageBoxButton.OK, MessageBoxImage.Information);
 
-            //}
-            //else
-            //{
-            //    MessageBox.Show("下发参数失败", "错误", MessageBoxButton.OK, MessageBoxImage.Error);
-            //}
+            }
+            else
+            {
+                MessageBox.Show("下发参数失败", "错误", MessageBoxButton.OK, MessageBoxImage.Error);
+            }
         }
     }
 }
