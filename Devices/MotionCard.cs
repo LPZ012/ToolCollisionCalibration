@@ -26,9 +26,9 @@ namespace ToolCollisionCalibration.Devices
 
         public async Task Reset(int ionum)
         {
-            ZAux_Direct_SetOp(ionum, 1);
-            await Task.Delay(10);
             ZAux_Direct_SetOp(ionum, 0);
+            await Task.Delay(500);
+            ZAux_Direct_SetOp(ionum, 1);
         }
 
         /// <summary>
@@ -82,8 +82,9 @@ namespace ToolCollisionCalibration.Devices
         /// <param name="AxisNumber">轴号</param>
         public async Task<ResultInfo> ReturnOrigin(int AxisNumber)
         {
-            var axisparam = axisParamModels[AxisNumber];
-            return await ReturnOriginal(AxisNumber, axisparam, -9999, 5, 3);
+            var Autoaxisparam = axisParamModels[AxisNumber];
+            var ReturnOriginalaxisparam = Autoaxisparam.DeepCopy(10);  //回零速度要慢，修改速度默认为10
+            return await ReturnOriginal(AxisNumber, ReturnOriginalaxisparam, -9999, 5, 3);
         }
     }
 }

@@ -97,7 +97,8 @@ namespace ToolCollisionCalibration.ViewModels
         {
             try
             {
-                motionCard.ZAux_Direct_GetInMulti(0, 35, inputStatus);
+                bool NoeErr = true;
+                motionCard.ZAux_Direct_GetInMulti(0, 31,ref inputStatus);
                 motionCard.ZAux_Direct_GetAllAxisInfo(4, IdleStatus, DposStatus, MposStatus, AxisStatus);
                 for (int i = 0; i < 4; i++)
                 {
@@ -106,24 +107,61 @@ namespace ToolCollisionCalibration.ViewModels
                     _IsettingServer.settingModel.AxisItems[i].Mpos = MposStatus[i];
                     _IsettingServer.settingModel.AxisItems[i].Status = AxisStatus[i];
                 }
+                if (inputStatus[0] == '0')
+                {
+                    Log.Write("销钉轴报警。", LogType.错误);
+                    NoeErr = false;
+                }
+                if (inputStatus[1] == '1')
+                {
+                    Log.Write("定位轴轴报警。", LogType.错误); 
+                    NoeErr = false;
+                }
+                if (inputStatus[2] == '1')
+                {
+                    Log.Write("旋转轴报警。", LogType.错误);
+                    NoeErr = false;
+                }
+                if (inputStatus[4] == '0')
+                {
+                    Log.Write("停止被按下。", LogType.错误);
+                    NoeErr = false;
+                }
+                if (inputStatus[13] == '0')
+                {
+                    Log.Write("光栅被遮挡。", LogType.错误);
+                    NoeErr = false;
+                }
+                if(!NoeErr)
+                {
+                    //轴运动立即停止
+                    motionCard.ZAux_Direct_CancelAxisList(4, [0, 1, 2, 3], 2);
+                    cts.Cancel();
+                }
                 //没有运行时才可以进行手动复位
                 if (inputStatus[3] == '1' && ListOldSinal[3] == '0' && !settingModel.IsRunning)
                 {
                     Reset();
                 }
-                //停止加光栅
-                if (inputStatus[4] == '0' || inputStatus[13] == '0')
-                {
-                    //轴运动立即停止
-                    motionCard.ZAux_Direct_CancelAxisList(4, [0,1,2,3], 2);
-                    cts.Cancel();
-                    Log.Write("停止被按下或光栅被遮挡。", LogType.提示);
-                    _IsettingServer.settingModel.IsReset = false;
-                }
                 ///判断上升沿启动
-                if (inputStatus[12] == '1' && ListOldSinal[12] == '0' && inputStatus[11] == '1' && ListOldSinal[11] == '0' && inputStatus[4] == '1' && inputStatus[13] == '1' && !_IsettingServer.settingModel.IsRunning)
+                if (inputStatus[12] == '1' && ListOldSinal[12] == '0' && inputStatus[11] == '1' && ListOldSinal[11] == '0'&& NoeErr && !_IsettingServer.settingModel.IsRunning && !IsResetting)
                 {
-                    if (inputStatus[0] == '1')
+                    if (inputStatus[16] != '1')
+                    {
+                        Log.Write("左固定气缸未缩回到位，请检查气缸缩回到位信号是否亮起。", LogType.错误);
+                        NoeErr = false;
+                    }
+                    if (inputStatus[17] != '1')
+                    {
+                        Log.Write("右固定气缸未缩回到位，请检查气缸缩回到位信号是否亮起。", LogType.错误);
+                        NoeErr = false;
+                    }
+                    if (inputStatus[18] != '1')
+                    {
+                        Log.Write("销钉气缸未缩回到位，请检查气缸缩回到位信号是否亮起。", LogType.错误);
+                        NoeErr = false;
+                    }
+                    if (!NoeErr) 
                     {
                         if (_IsettingServer.settingModel.IsReset)
                         {
@@ -135,11 +173,6 @@ namespace ToolCollisionCalibration.ViewModels
                             Log.Write("请复位再启动。", LogType.提示);
                         }
                     }
-                    else
-                    {
-                        Log.Write("销钉气缸未缩回到位，请检查气缸缩回到位信号是否亮起。", LogType.提示);
-                    }
-                    
                 }
                 ListOldSinal = inputStatus.Copy();
             }
@@ -148,6 +181,7 @@ namespace ToolCollisionCalibration.ViewModels
                 Log.Write(ex.ToString(), LogType.错误);
             }
         }
+
 
         
 
@@ -177,11 +211,19 @@ namespace ToolCollisionCalibration.ViewModels
         private async Task ResetMachine(bool ManualAuto)
         {
             _IsettingServer.settingModel.IsReset = false;
+            //轴上使能
+            motionCard.ZAux_Direct_SetOp(10, 1);
             //所有轴立即停止
             motionCard.ZAux_Direct_CancelAxisList(4, [0, 1, 2, 3], 2);
+
+            
+
             //所有气缸缩回(除两个固定气缸除外)
             motionCard.ZAux_Direct_SetOutMulti(0, 1, [0, 0]);
             motionCard.ZAux_Direct_SetOutMulti(4, 6, [0,0,0]);
+            //真空阀供气停止
+            motionCard.ZAux_Direct_SetOp(9,0);
+
 
             await Task.Delay(1000);
             //检查气缸是否缩回到位
@@ -193,8 +235,12 @@ namespace ToolCollisionCalibration.ViewModels
 
             if (!ManualAuto)   
             {
+                //是否需要断轴使能?
+
+                //轴报警复位
+                await motionCard.Reset(11);
                 //灯复位
-                motionCard.ZAux_Direct_SetOutMulti(7, 9, [0, 0, 0]);
+                motionCard.ZAux_Direct_SetOutMulti(7, 8, [0, 0]);
 
                 Log.Write("正在进行销钉轴回零。");
                 var Axis1Result = await motionCard.ReturnOrigin(1);
@@ -267,8 +313,6 @@ namespace ToolCollisionCalibration.ViewModels
             //OK灯复位NG灯复位  测试灯运行
             motionCard.ZAux_Direct_SetOutMulti(7, 8, [0, 0]);
             if (!await AxisMoveToInitialPosition()) return false;
-            //扭矩、角度传感器初始化
-
             //扫码
             while (settingModel.localparams.ScanEnable)
             {
@@ -289,9 +333,7 @@ namespace ToolCollisionCalibration.ViewModels
                 dataBaseModel.ProdLineNo = SN_Code[2].Substring(6, 2);
                 dataBaseModel.OrderNum = settingModel.DBParams.OrderNum;
                 dataBaseModel.WorkStation = settingModel.localparams.WorkStation;
-                dataBaseModel.StartingTorque = dBParams.StartingTorque.ToString();
-                dataBaseModel.EndTorque = dBParams.EndTorque.ToString();
-                dataBaseModel.InvertAngleCompensation = dBParams.InvertAngleCompensation.ToString();
+                
                 break;
             }
             //if (settingModel.localparams.DebugEnable)
@@ -307,18 +349,23 @@ namespace ToolCollisionCalibration.ViewModels
             //        return false;
             //    }
             //}
-
+            dataBaseModel.StartingTorque = dBParams.StartingTorque.ToString();
+            dataBaseModel.EndTorque = dBParams.EndTorque.ToString();
+            dataBaseModel.InvertAngleCompensation = dBParams.InvertAngleCompensation.ToString();
+            //旋转轴开始旋转
+            motionCard.Vmove(3, 1);
             //angleDevice.SetDirection(false);
             //await Task.Delay(50,cts.Token);
-            angleDevice.ResetZero();
-            torqueDevice.ResetZero();
+            
             return true;
         }
 
         private async Task Run()
         {
             //固定气缸动作
-            motionCard.ZAux_Direct_SetOutMulti(2, 3, [1, 1]);
+            //motionCard.ZAux_Direct_SetOutMulti(2, 3, [1, 1]);
+            motionCard.ZAux_Direct_SetOp(2, 1);
+            motionCard.ZAux_Direct_SetOp(3, 1);
             await Task.Delay(500, cts.Token);
             //定位轴移动到工作位置
             var MoveAbsResult = await motionCard.MoveAbs_DoneStatus(2, settingModel.localparams.LocationAxis_WorkPosition, 50);
@@ -333,8 +380,8 @@ namespace ToolCollisionCalibration.ViewModels
 
             //等待气缸动作完成
             await Task.Delay(2000,cts.Token);
-            //Z轴开始运行
-            motionCard.Vmove(3, 1);
+            angleDevice.ResetZero();
+            torqueDevice.ResetZero();
             //标志位
             bool StartingAngleIsSuccess = false;
             while (deviceValueModel.RealTorque < dBParams.EndTorque)
@@ -374,10 +421,10 @@ namespace ToolCollisionCalibration.ViewModels
             ////延时
             //await Task.Delay(1000, cts.Token);
 
-
+            await Task.Delay(1000, cts.Token);
             //根据反转角度计算需要反转到的角度
             float.TryParse(dataBaseModel.EndAngle, out float EndAngle);
-            var Angle = EndAngle - dBParams.InvertAngleCompensation;
+            dataBaseModel.InvertPositon = Math.Round(EndAngle - dBParams.InvertAngleCompensation,2);
             //旋转轴反向旋转
             motionCard.Vmove(3, -1);
             //判断是否到达设定的反转角度
@@ -387,7 +434,7 @@ namespace ToolCollisionCalibration.ViewModels
                 if (angleresult.IsSuccess)
                 {
                     deviceValueModel.RealAngle = angleresult.Result[0];
-                    if(deviceValueModel.RealAngle <= Angle)
+                    if(deviceValueModel.RealAngle <= dataBaseModel.InvertPositon)
                     {
                         //到达后旋转位置立即停止
                         motionCard.AxisStop(3);
@@ -401,8 +448,11 @@ namespace ToolCollisionCalibration.ViewModels
             //取销钉
             motionCard.ZAux_Direct_SetOp(1, 1);
             await Task.Delay(2000,cts.Token);
+            motionCard.ZAux_Direct_SetOp(9, 1);
+            await Task.Delay(2000, cts.Token);
             motionCard.ZAux_Direct_SetOp(1, 0);
             await Task.Delay(2000, cts.Token);
+            
 
             //销钉轴移动到工作位置
             var Moveresult = await motionCard.MoveAbs_DoneStatus(1, settingModel.localparams.PinAxis_WorkPosition, 50);
@@ -414,6 +464,8 @@ namespace ToolCollisionCalibration.ViewModels
             //移动到指定位置之后开始打销钉
             motionCard.ZAux_Direct_SetOp(1, 1);
             await Task.Delay(2000, cts.Token);
+            motionCard.ZAux_Direct_SetOp(9, 0);
+            await Task.Delay(2000, cts.Token);
         }
 
         /// <summary>
@@ -421,17 +473,27 @@ namespace ToolCollisionCalibration.ViewModels
         /// </summary>
         private async Task EndInits()
         {
-            
-            if (dataBaseModel.TestResult)  //测试合格
+
+            try
             {
-                TestResult = "PASS";
+                if (dataBaseModel.TestResult)  //测试合格
+                {
+                    TestResult = "PASS";
+                }
+                else
+                {
+                    TestResult = "NG";
+                }
+                await ResetMachine(true);
             }
-            else
+            catch (Exception ex)
             {
-                TestResult = "NG";
+                Log.Write("结束初始化发生错误。", LogType.错误);
             }
-            await ResetMachine(true);
-            _IsettingServer.settingModel.IsRunning = false;
+            finally
+            {
+                _IsettingServer.settingModel.IsRunning = false;
+            }
         }
         protected void OnPropertyChanged(string propertyName)
         {

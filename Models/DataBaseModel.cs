@@ -67,6 +67,8 @@ namespace ToolCollisionCalibration.Models
         
         [Name("扭矩差值")]
         public string TorqueDifference { get; set; }
+        [Name("反转位置")]
+        public double InvertPositon { get; set; }
 
         // --- INotifyPropertyChanged 实现 ---
         public event PropertyChangedEventHandler PropertyChanged;

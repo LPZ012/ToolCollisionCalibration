@@ -78,6 +78,10 @@
                             <TextBlock Text="扭矩差值" FontSize="16"/>
                             <TextBox Text="{Binding dataBaseModel.TorqueDifference}" Width="170" FontSize="16" IsReadOnly="True" TextAlignment="Center" Margin="5,0,0,0"/>
                         </StackPanel>
+                        <StackPanel Orientation="Horizontal" Margin="0,5,0,0">
+                            <TextBlock Text="反转位置" FontSize="16"/>
+                            <TextBox Text="{Binding dataBaseModel.InvertPositon}" Width="170" FontSize="16" IsReadOnly="True" TextAlignment="Center" Margin="5,0,0,0"/>
+                        </StackPanel>
                     </StackPanel>
 
                 </Grid>

@@ -261,9 +261,9 @@
                         <Button Content="伺服上使能" Command="{Binding TurnOnOutPutCommand}" CommandParameter="10"  Height="36" Margin="5" Style="{StaticResource IOButtonStyle}"/>
                         <Button Content="右定位气缸缩回" Command="{Binding TurnOffOutPutCommand}" CommandParameter="0" Height="36" Margin="5" Style="{StaticResource IOButtonStyle}"/>
                         <Button Content="右定位气缸伸出" Command="{Binding TurnOnOutPutCommand}" CommandParameter="0" Height="36" Margin="5" Style="{StaticResource IOButtonStyle}"/>
-                        <Button Content="真空阀断气" Command="{Binding TurnOffOutPutCommand}" CommandParameter="11" Height="36" Margin="5" Style="{StaticResource IOButtonStyle}"/>
-                        <Button Content="真空阀供气" Command="{Binding TurnOnOutPutCommand}" CommandParameter="11" Height="36" Margin="5" Style="{StaticResource IOButtonStyle}"/>
-                        <Button Content="伺服复位" Command="{Binding ServoResetCommand}" CommandParameter="9" Height="36" Margin="5" Style="{StaticResource IOButtonStyle}"/>
+                        <Button Content="真空阀断气" Command="{Binding TurnOffOutPutCommand}" CommandParameter="9" Height="36" Margin="5" Style="{StaticResource IOButtonStyle}"/>
+                        <Button Content="真空阀供气" Command="{Binding TurnOnOutPutCommand}" CommandParameter="9" Height="36" Margin="5" Style="{StaticResource IOButtonStyle}"/>
+                        <Button Content="伺服复位" Command="{Binding ServoResetCommand}" CommandParameter="10" Height="36" Margin="5" Style="{StaticResource IOButtonStyle}"/>
                         <Button Content="保存参数" Command="{Binding SaveParamsCommand}" Height="36" Margin="5" Style="{StaticResource IOButtonStyle}"/>
                     </ItemsControl>
                 </GroupBox>
