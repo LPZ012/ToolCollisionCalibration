@@ -339,12 +339,12 @@ namespace ToolCollisionCalibration.ViewModels
             bool StartingAngleIsSuccess = false;
             while (deviceValueModel.RealTorque < dBParams.EndTorque)
             {
-                var torqueresult = await torqueDevice.ReadTorque(50, 1);
+                var torqueresult = await torqueDevice.ReadTorque(50, settingModel.localparams.TorqueCoefficient);
                 if (torqueresult.IsSuccess)
                 {
                     deviceValueModel.RealTorque = torqueresult.Result[0];
                 }
-                var angleresult = await angleDevice.ReadAngle(50, 1);
+                var angleresult = await angleDevice.ReadAngle(50, settingModel.localparams.AngleCoefficient);
                 if(angleresult.IsSuccess)
                 {
                     deviceValueModel.RealAngle = angleresult.Result[0];
@@ -383,7 +383,7 @@ namespace ToolCollisionCalibration.ViewModels
             //判断是否到达设定的反转角度
             while(true)
             {
-                var angleresult = await angleDevice.ReadAngle(50, 1);
+                var angleresult = await angleDevice.ReadAngle(50, settingModel.localparams.AngleCoefficient);
                 if (angleresult.IsSuccess)
                 {
                     deviceValueModel.RealAngle = angleresult.Result[0];
