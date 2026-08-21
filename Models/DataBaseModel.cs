@@ -51,7 +51,7 @@ namespace ToolCollisionCalibration.Models
         public string EndAngle { get; set; }
 
         
-        [Name("角度差")]
+        [Name("角度差值")]
         public string AngleDifference { get; set; }
 
         [Name("反转角度")]
@@ -65,7 +65,7 @@ namespace ToolCollisionCalibration.Models
         public string EndTorque { get; set; }
 
         
-        [Name("扭矩差")]
+        [Name("扭矩差值")]
         public string TorqueDifference { get; set; }
 
         // --- INotifyPropertyChanged 实现 ---

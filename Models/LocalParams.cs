@@ -44,6 +44,11 @@ namespace ToolCollisionCalibration.Models
         /// </summary>
         public float AngleCoefficient { get; set; } = 1;
 
+        /// <summary>
+        /// 扭矩系数
+        /// </summary>
+        public float TorqueCoefficient { get; set; } = 1;
+
         public SerialPortModel ScannerModel { get; set; }
         public SerialPortModel TorqueModel { get; set; }
         public SerialPortModel AngleModel { get; set; }

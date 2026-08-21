@@ -1,4 +1,5 @@
-﻿using System;
+﻿using CsvHelper.Configuration.Attributes;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
@@ -11,7 +12,16 @@ namespace ToolCollisionCalibration.Models
     {
         public string OrderNum { get; set; }
         public string ProductModel { get; set; }
-        
+
+        /// <summary>
+        /// 反转角度
+        /// </summary>
+        public float InvertAngleCompensation { get; set; }
+
+        public float StartingTorque { get; set; }
+
+
+        public float EndTorque { get; set; }
 
         public event PropertyChangedEventHandler PropertyChanged;
         protected void OnPropertyChanged(string propertyName)

@@ -43,11 +43,43 @@
                             <TextBlock Text="产品型号" FontSize="16"/>
                             <TextBox Text="{Binding dataBaseModel.ProductModel}" Width="170" FontSize="16" IsReadOnly="True" TextAlignment="Center" Margin="5,0,0,0"/>
                         </StackPanel>
+                    </StackPanel>
+                    <StackPanel Orientation="Vertical" Grid.Column="2">
                         <StackPanel Orientation="Horizontal" Margin="0,5,0,0">
-                            <TextBlock Text="当前角度" FontSize="16"/>
+                            <TextBlock Text="实时角度" FontSize="16"/>
                             <TextBox Text="{Binding deviceValueModel.RealAngle}" Width="170" FontSize="16" IsReadOnly="True" TextAlignment="Center" Margin="5,0,0,0"/>
                         </StackPanel>
+                        <StackPanel Orientation="Horizontal" Margin="0,5,0,0">
+                            <TextBlock Text="实时扭矩" FontSize="16"/>
+                            <TextBox Text="{Binding deviceValueModel.RealTorque}" Width="170" FontSize="16" IsReadOnly="True" TextAlignment="Center" Margin="5,0,0,0"/>
+                        </StackPanel>
+                        <StackPanel Orientation="Horizontal" Margin="0,5,0,0">
+                            <TextBlock Text="起始角度" FontSize="16"/>
+                            <TextBox Text="{Binding dataBaseModel.StartingAngle}" Width="170" FontSize="16" IsReadOnly="True" TextAlignment="Center" Margin="5,0,0,0"/>
+                        </StackPanel>
+                        <StackPanel Orientation="Horizontal" Margin="0,5,0,0">
+                            <TextBlock Text="结束角度" FontSize="16"/>
+                            <TextBox Text="{Binding dataBaseModel.EndAngle}" Width="170" FontSize="16" IsReadOnly="True" TextAlignment="Center" Margin="5,0,0,0"/>
+                        </StackPanel>
+                        <StackPanel Orientation="Horizontal" Margin="0,5,0,0">
+                            <TextBlock Text="角度差值" FontSize="16"/>
+                            <TextBox Text="{Binding dataBaseModel.AngleDifference}" Width="170" FontSize="16" IsReadOnly="True" TextAlignment="Center" Margin="5,0,0,0"/>
+                        </StackPanel>
+
+                        <StackPanel Orientation="Horizontal" Margin="0,5,0,0">
+                            <TextBlock Text="起始扭矩" FontSize="16"/>
+                            <TextBox Text="{Binding dataBaseModel.StartingTorque}" Width="170" FontSize="15" IsReadOnly="True" TextAlignment="Center" Margin="5,0,10,0"/>
+                        </StackPanel>
+                        <StackPanel Orientation="Horizontal" Margin="0,5,0,0">
+                            <TextBlock Text="结束扭矩" FontSize="16"/>
+                            <TextBox Text="{Binding dataBaseModel.EndTorque}" Width="170" FontSize="16" IsReadOnly="True" TextAlignment="Center" Margin="5,0,0,0"/>
+                        </StackPanel>
+                        <StackPanel Orientation="Horizontal" Margin="0,5,0,0">
+                            <TextBlock Text="扭矩差值" FontSize="16"/>
+                            <TextBox Text="{Binding dataBaseModel.TorqueDifference}" Width="170" FontSize="16" IsReadOnly="True" TextAlignment="Center" Margin="5,0,0,0"/>
+                        </StackPanel>
                     </StackPanel>
+
                 </Grid>
                 <DataGrid Grid.Row="3" x:Name="LogDataGrid" IsReadOnly="True" AutoGenerateColumns="False" CanUserAddRows="False" CanUserSortColumns="False" FontSize="15">
                     <DataGrid.Columns>

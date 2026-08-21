@@ -25,7 +25,23 @@
                 </StackPanel>
             </GroupBox>
             <GroupBox Header="本地参数" Margin="5,5,0,0" FontSize="16" Padding="10">
-                <Grid>
+                <StackPanel Orientation="Vertical">
+                    <StackPanel Orientation="Horizontal">
+                        <TextBlock Text="产品线号" FontSize="16"/>
+                        <TextBox Text="{Binding _IsettingServer.settingModel.localparams.ProdLineNo}" Width="70"  TextAlignment="Center" FontSize="15" Margin="0,0,20,0"/>
+                        <TextBlock Text="机台编号" FontSize="16"/>
+                        <TextBox Text="{Binding _IsettingServer.settingModel.localparams.WorkStation}" Width="70"  TextAlignment="Center" FontSize="15"/>
+                    </StackPanel>
+                    <StackPanel Orientation="Horizontal">
+                        <TextBlock Text="角度系数" FontSize="16"/>
+                        <TextBox Text="{Binding _IsettingServer.settingModel.localparams.AngleCoefficient}" Width="70"  TextAlignment="Center" FontSize="15" Margin="0,0,20,0"/>
+                        <StackPanel Orientation="Horizontal">
+                            <TextBlock Text="扭矩系数" FontSize="16"/>
+                            <TextBox Text="{Binding _IsettingServer.settingModel.localparams.TorqueCoefficient}" Width="70"  TextAlignment="Center" FontSize="15"/>
+                        </StackPanel>
+                    </StackPanel>
+                </StackPanel>
+                <!--<Grid>
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="Auto"/>
                         <ColumnDefinition Width="85"/>
@@ -52,7 +68,7 @@
                     <StackPanel Grid.Column="5" Orientation="Vertical">
                         <TextBox Text="{Binding _IsettingServer.settingModel.localparams.AngleCoefficient}" Width="70"  TextAlignment="Center" FontSize="15"/>
                     </StackPanel>
-                </Grid>
+                </Grid>-->
             </GroupBox>
 
             <StackPanel Orientation="Horizontal" Margin="60,10" >
@@ -92,7 +108,7 @@
                     </StackPanel>
                 </Grid>
             </GroupBox>
-            <!--<GroupBox Header="工艺参数" Margin="5,5,0,0" FontSize="16" Padding="10">
+            <GroupBox Header="工艺参数" Margin="5,5,0,0" FontSize="16" Padding="10">
                 <Grid>
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="Auto"/>
@@ -100,22 +116,22 @@
                     </Grid.ColumnDefinitions>
                     <StackPanel Grid.Column="0" Orientation="Vertical">
                         <TextBlock Text="起始扭矩" FontSize="16"/>
-                        <TextBlock Text="扭矩上限" FontSize="16" Margin="0,6"/>
-                        <TextBlock Text="扭矩下限" FontSize="16"/>
-                        <TextBlock Text="角度上限" FontSize="16" Margin="0,6"/>
+                        <TextBlock Text="结束扭矩" FontSize="16" Margin="0,6"/>
+                        <TextBlock Text="反转角度" FontSize="16"/>
+                        <!--<TextBlock Text="角度上限" FontSize="16" Margin="0,6"/>
                         <TextBlock Text="角度下限" FontSize="16"/>
-                        <TextBlock Text="反转角度" FontSize="16" Margin="0,6"/>
+                        <TextBlock Text="反转角度" FontSize="16" Margin="0,6"/>-->
                     </StackPanel>
                     <StackPanel Grid.Column="2" Orientation="Vertical">
+                        <TextBox Text="{Binding _IsettingServer.settingModel.DBParams.StartingTorque}" Width="230"  TextAlignment="Center" FontSize="15"/>
+                        <TextBox Text="{Binding _IsettingServer.settingModel.DBParams.EndTorque}" Width="230"  TextAlignment="Center" FontSize="15" Margin="0,5"/>
+                        <TextBox Text="{Binding _IsettingServer.settingModel.DBParams.InvertAngleCompensation}" Width="230"  TextAlignment="Center" FontSize="15"/>
+                        <!--<TextBox Text="{Binding _IsettingServer.settingModel.DBParams.OrderNum}" Width="230"  TextAlignment="Center" FontSize="15" Margin="0,6"/>
                         <TextBox Text="{Binding _IsettingServer.settingModel.DBParams.ProductModel}" Width="230"  TextAlignment="Center" FontSize="15"/>
-                        <TextBox Text="{Binding _IsettingServer.settingModel.DBParams.OrderNum}" Width="230"  TextAlignment="Center" FontSize="15" Margin="0,5"/>
-                        <TextBox Text="{Binding _IsettingServer.settingModel.DBParams.ProductModel}" Width="230"  TextAlignment="Center" FontSize="15"/>
-                        <TextBox Text="{Binding _IsettingServer.settingModel.DBParams.OrderNum}" Width="230"  TextAlignment="Center" FontSize="15" Margin="0,6"/>
-                        <TextBox Text="{Binding _IsettingServer.settingModel.DBParams.ProductModel}" Width="230"  TextAlignment="Center" FontSize="15"/>
-                        <TextBox Text="{Binding _IsettingServer.settingModel.DBParams.OrderNum}" Width="230"  TextAlignment="Center" FontSize="15" Margin="0,6"/>
+                        <TextBox Text="{Binding _IsettingServer.settingModel.DBParams.OrderNum}" Width="230"  TextAlignment="Center" FontSize="15" Margin="0,6"/>-->
                     </StackPanel>
                 </Grid>
-            </GroupBox>-->
+            </GroupBox>
 
         </StackPanel>
     </Grid>

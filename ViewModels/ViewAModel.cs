@@ -106,7 +106,8 @@ namespace ToolCollisionCalibration.ViewModels
                     _IsettingServer.settingModel.AxisItems[i].Mpos = MposStatus[i];
                     _IsettingServer.settingModel.AxisItems[i].Status = AxisStatus[i];
                 }
-                if (inputStatus[3] == '1' && ListOldSinal[3] == '0')
+                //没有运行时才可以进行手动复位
+                if (inputStatus[3] == '1' && ListOldSinal[3] == '0' && !settingModel.IsRunning)
                 {
                     Reset();
                 }
@@ -114,7 +115,7 @@ namespace ToolCollisionCalibration.ViewModels
                 if (inputStatus[4] == '0' || inputStatus[13] == '0')
                 {
                     //轴运动立即停止
-                    motionCard.ZAux_Direct_CancelAxisList(4, new int[] { 0, 1, 2, 3 }, 2);
+                    motionCard.ZAux_Direct_CancelAxisList(4, [0,1,2,3], 2);
                     cts.Cancel();
                     Log.Write("停止被按下或光栅被遮挡。", LogType.提示);
                     _IsettingServer.settingModel.IsReset = false;
@@ -176,7 +177,8 @@ namespace ToolCollisionCalibration.ViewModels
         private async Task ResetMachine(bool ManualAuto)
         {
             _IsettingServer.settingModel.IsReset = false;
-
+            //所有轴立即停止
+            motionCard.ZAux_Direct_CancelAxisList(4, [0, 1, 2, 3], 2);
             //所有气缸缩回(除两个固定气缸除外)
             motionCard.ZAux_Direct_SetOutMulti(0, 1, [0, 0]);
             motionCard.ZAux_Direct_SetOutMulti(4, 6, [0,0,0]);
@@ -258,8 +260,10 @@ namespace ToolCollisionCalibration.ViewModels
         private async Task<bool> StartInit()
         {
             TestResult = "运行中";
+            ClearAll();
             cts = new CancellationTokenSource();
             dataBaseModel = new DataBaseModel();
+            deviceValueModel = new DeviceValueModel();
             //OK灯复位NG灯复位  测试灯运行
             motionCard.ZAux_Direct_SetOutMulti(7, 8, [0, 0]);
             if (!await AxisMoveToInitialPosition()) return false;
@@ -285,26 +289,29 @@ namespace ToolCollisionCalibration.ViewModels
                 dataBaseModel.ProdLineNo = SN_Code[2].Substring(6, 2);
                 dataBaseModel.OrderNum = settingModel.DBParams.OrderNum;
                 dataBaseModel.WorkStation = settingModel.localparams.WorkStation;
+                dataBaseModel.StartingTorque = dBParams.StartingTorque.ToString();
+                dataBaseModel.EndTorque = dBParams.EndTorque.ToString();
+                dataBaseModel.InvertAngleCompensation = dBParams.InvertAngleCompensation.ToString();
                 break;
             }
-            if (settingModel.localparams.DebugEnable)
-            {
-                if (!dataBaseModel.ProdLineNo.Equals(settingModel.localparams.ProdLineNo))
-                {
-                    Log.Write("非本线产品不允许运行！", LogType.提示);
-                    return false;
-                }
-                if (!sqlClient.IsConnected)
-                {
-                    Log.Write("与数据库连接异常！", LogType.错误);
-                    return false;
-                }
-            }
+            //if (settingModel.localparams.DebugEnable)
+            //{
+            //    if (!dataBaseModel.ProdLineNo.Equals(settingModel.localparams.ProdLineNo))
+            //    {
+            //        Log.Write("非本线产品不允许运行！", LogType.提示);
+            //        return false;
+            //    }
+            //    if (!sqlClient.IsConnected)
+            //    {
+            //        Log.Write("与数据库连接异常！", LogType.错误);
+            //        return false;
+            //    }
+            //}
 
-            angleDevice.SetDirection(false);
-            await Task.Delay(50,cts.Token);
+            //angleDevice.SetDirection(false);
+            //await Task.Delay(50,cts.Token);
             angleDevice.ResetZero();
-
+            torqueDevice.ResetZero();
             return true;
         }
 
@@ -328,48 +335,85 @@ namespace ToolCollisionCalibration.ViewModels
             await Task.Delay(2000,cts.Token);
             //Z轴开始运行
             motionCard.Vmove(3, 1);
-            //模拟使用
-            DateTime dateTime = DateTime.Now;
-            while((DateTime.Now - dateTime).TotalSeconds < 15)
+            //标志位
+            bool StartingAngleIsSuccess = false;
+            while (deviceValueModel.RealTorque < dBParams.EndTorque)
             {
-                //var torqueresult = await  torqueDevice.ReadTorque(50, 1);
-                //if(torqueresult.IsSuccess)
-                //{
-                //    deviceValueModel.RealTorque = torqueresult.Result[0];
-                //}
+                var torqueresult = await torqueDevice.ReadTorque(50, 1);
+                if (torqueresult.IsSuccess)
+                {
+                    deviceValueModel.RealTorque = torqueresult.Result[0];
+                }
                 var angleresult = await angleDevice.ReadAngle(50, 1);
                 if(angleresult.IsSuccess)
                 {
                     deviceValueModel.RealAngle = angleresult.Result[0];
                 }
-                await Task.Delay(50,cts.Token);
+                AddPointFromInput(deviceValueModel.RealAngle, deviceValueModel.RealTorque);
+                if (deviceValueModel.RealTorque >= dBParams.StartingTorque && !StartingAngleIsSuccess)
+                {
+                    dataBaseModel.StartingAngle = deviceValueModel.RealAngle.ToString();
+                    StartingAngleIsSuccess = true;
+                }
+                if(deviceValueModel.RealTorque >= dBParams.EndTorque)
+                {
+                    dataBaseModel.EndAngle = deviceValueModel.RealAngle.ToString();
+                    //旋转轴立即停止
+                    motionCard.AxisStop(3);
+                }
+                await Task.Delay(10,cts.Token);
             }
 
-            //模拟测试逻辑结束
+            ////开始打阻值，垂直和倾斜气缸同时伸出
+            //motionCard.ZAux_Direct_SetOutMulti(4, 5, [1, 1]);
+            ////延时
+            //await Task.Delay(1000,cts.Token);
+            ////判断(没写)
+            ////垂直和倾斜气缸同时缩回
+            //motionCard.ZAux_Direct_SetOutMulti(4, 5, [0, 0]);
+            ////延时
+            //await Task.Delay(1000, cts.Token);
 
-            //Z轴停止
-            motionCard.AxisStop(3);
 
-            //左右固定气缸复位
-            motionCard.ZAux_Direct_SetOp(6, 0);
-            motionCard.ZAux_Direct_SetOp(0, 0);
+            //根据反转角度计算需要反转到的角度
+            float.TryParse(dataBaseModel.EndAngle, out float EndAngle);
+            var Angle = EndAngle - dBParams.InvertAngleCompensation;
+            //旋转轴反向旋转
+            motionCard.Vmove(3, -1);
+            //判断是否到达设定的反转角度
+            while(true)
+            {
+                var angleresult = await angleDevice.ReadAngle(50, 1);
+                if (angleresult.IsSuccess)
+                {
+                    deviceValueModel.RealAngle = angleresult.Result[0];
+                    if(deviceValueModel.RealAngle <= Angle)
+                    {
+                        //到达后旋转位置立即停止
+                        motionCard.AxisStop(3);
+                        break;
+                    }
+                }
+                await Task.Delay (10,cts.Token);
+            }
 
+            //开始进行打销钉步骤
             //取销钉
             motionCard.ZAux_Direct_SetOp(1, 1);
-            await Task.Delay(1000,cts.Token);
+            await Task.Delay(2000,cts.Token);
             motionCard.ZAux_Direct_SetOp(1, 0);
-            await Task.Delay(1000, cts.Token);
-            //销钉轴运动到工作位置
-            var MoveResult = await motionCard.MoveAbs_DoneStatus(1, settingModel.localparams.PinAxis_WorkPosition, 50);
-            if(!MoveResult.IsSuccess)
+            await Task.Delay(2000, cts.Token);
+
+            //销钉轴移动到工作位置
+            var Moveresult = await motionCard.MoveAbs_DoneStatus(1, settingModel.localparams.PinAxis_WorkPosition, 50);
+            if (!Moveresult.IsSuccess)
             {
                 Log.Write("销钉轴移动到工作位置失败。" + MoveAbsResult.ErrMessage, LogType.错误);
                 return;
             }
-            //开始打销钉
+            //移动到指定位置之后开始打销钉
             motionCard.ZAux_Direct_SetOp(1, 1);
-            await Task.Delay(1000, cts.Token);
-            //测试完成，进行复位操作
+            await Task.Delay(2000, cts.Token);
         }
 
         /// <summary>
@@ -454,13 +498,13 @@ namespace ToolCollisionCalibration.ViewModels
         /// X 轴范围最大值，超过当前值会被 NiceCeiling 扩展到易读刻度（1/2/5 系列），
         /// 只增不减：避免点缩小范围引起视图端反复重排（经验 151077：抖动问题的根源之一是缩小边界）。
         /// </summary>
-        public double XMax { get; private set; } = 10;
+        public double XMax { get; private set; } = 15;
 
         /// <summary>Y 轴范围最小值（当前固定为 0）。</summary>
         public double YMin { get; private set; } = 0;
 
         /// <summary>Y 轴范围最大值，同 XMax 的扩展逻辑。</summary>
-        public double YMax { get; private set; } = 10;
+        public double YMax { get; private set; } = 5;
         public string XInput { get; set; }
 
         /// <summary>Y 输入框文本。</summary>
@@ -504,8 +548,8 @@ namespace ToolCollisionCalibration.ViewModels
         {
             // ObservableCollection.Clear() 抛出 CollectionChanged 即够视图清空所有点
             Points.Clear();
-            XMin = 0; XMax = 10;
-            YMin = 0; YMax = 10;
+            XMin = 0; XMax = 150;
+            YMin = 0; YMax = 5;
             // 点数归零后重新拼 Status
             UpdateStatus();
         }

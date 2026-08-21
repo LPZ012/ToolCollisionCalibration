@@ -11,6 +11,7 @@ using WPFLibrary.Zmotion;
 using WPFLibrary.Torque;
 using WPFLibrary.AngleDevice;
 using WPFLibrary.欧艾迪;
+using WPFLibrary.斯巴拓;
 namespace ToolCollisionCalibration.Servers.Setting
 {
     /// <summary>
@@ -64,10 +65,9 @@ namespace ToolCollisionCalibration.Servers.Setting
                     Param = settingModel.localparams.AxisParamModels[i]
                 });
             }
-            //更新参数屏蔽
             //先从本地加载产品参数
             settingModel.DBParams = JsonHelper.ReadJson<DBParams>(FilePath.DBParamFolder,FilePath.DBParamFile) ?? new DBParams();
-            //GetParamsFromDB();
+            GetParamsFromDB();
             //更新参数屏蔽
             return true;
         }
@@ -107,7 +107,7 @@ namespace ToolCollisionCalibration.Servers.Setting
         public void InitDevices()
         {
             Scanner = new ScanHome(settingModel.localparams.ScannerModel);
-            //缺少扭矩实例
+            TorqueDevice = new SBT8411(settingModel.localparams.TorqueModel);
             AngleDevice = new OID_R2_3806D_15S1S(settingModel.localparams.AngleModel, 32768);
             motionCard = new MotionCard(new WPFLibrary.Sockets.TCPIP.TCPIPModel("192.168.0.11",1000,"motionCard"),settingModel.localparams.AxisParamModels);
         }
