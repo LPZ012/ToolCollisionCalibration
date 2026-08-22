@@ -97,7 +97,7 @@ namespace ToolCollisionCalibration.ViewModels
         {
             try
             {
-                bool NoeErr = true;
+                bool NoErr = true;
                 motionCard.ZAux_Direct_GetInMulti(0, 31,ref inputStatus);
                 motionCard.ZAux_Direct_GetAllAxisInfo(4, IdleStatus, DposStatus, MposStatus, AxisStatus);
                 for (int i = 0; i < 4; i++)
@@ -109,30 +109,30 @@ namespace ToolCollisionCalibration.ViewModels
                 }
                 if (inputStatus[0] == '0')
                 {
-                    Log.Write("销钉轴报警。", LogType.错误);
-                    NoeErr = false;
+                    Log.Write("销钉轴报警。", LogType.提示);
+                    NoErr = false;
                 }
                 if (inputStatus[1] == '1')
                 {
-                    Log.Write("定位轴轴报警。", LogType.错误); 
-                    NoeErr = false;
+                    Log.Write("定位轴轴报警。", LogType.提示); 
+                    NoErr = false;
                 }
                 if (inputStatus[2] == '1')
                 {
-                    Log.Write("旋转轴报警。", LogType.错误);
-                    NoeErr = false;
+                    Log.Write("旋转轴报警。", LogType.提示);
+                    NoErr = false;
                 }
                 if (inputStatus[4] == '0')
                 {
-                    Log.Write("停止被按下。", LogType.错误);
-                    NoeErr = false;
+                    Log.Write("停止被按下。", LogType.提示);
+                    NoErr = false;
                 }
                 if (inputStatus[13] == '0')
                 {
-                    Log.Write("光栅被遮挡。", LogType.错误);
-                    NoeErr = false;
+                    Log.Write("光栅被遮挡。", LogType.提示);
+                    NoErr = false;
                 }
-                if(!NoeErr)
+                if(!NoErr)
                 {
                     //轴运动立即停止
                     motionCard.ZAux_Direct_CancelAxisList(4, [0, 1, 2, 3], 2);
@@ -144,24 +144,24 @@ namespace ToolCollisionCalibration.ViewModels
                     Reset();
                 }
                 ///判断上升沿启动
-                if (inputStatus[12] == '1' && ListOldSinal[12] == '0' && inputStatus[11] == '1' && ListOldSinal[11] == '0'&& NoeErr && !_IsettingServer.settingModel.IsRunning && !IsResetting)
+                if (inputStatus[12] == '1' && ListOldSinal[12] == '0' && inputStatus[11] == '1' && ListOldSinal[11] == '0'&& NoErr && !_IsettingServer.settingModel.IsRunning && !IsResetting)
                 {
                     if (inputStatus[16] != '1')
                     {
-                        Log.Write("左固定气缸未缩回到位，请检查气缸缩回到位信号是否亮起。", LogType.错误);
-                        NoeErr = false;
+                        Log.Write("左固定气缸未缩回到位，请检查气缸缩回到位信号是否亮起。", LogType.提示);
+                        NoErr = false;
                     }
                     if (inputStatus[17] != '1')
                     {
-                        Log.Write("右固定气缸未缩回到位，请检查气缸缩回到位信号是否亮起。", LogType.错误);
-                        NoeErr = false;
+                        Log.Write("右固定气缸未缩回到位，请检查气缸缩回到位信号是否亮起。", LogType.提示);
+                        NoErr = false;
                     }
                     if (inputStatus[18] != '1')
                     {
-                        Log.Write("销钉气缸未缩回到位，请检查气缸缩回到位信号是否亮起。", LogType.错误);
-                        NoeErr = false;
+                        Log.Write("销钉气缸未缩回到位，请检查气缸缩回到位信号是否亮起。", LogType.提示);
+                        NoErr = false;
                     }
-                    if (!NoeErr) 
+                    if (NoErr) 
                     {
                         if (_IsettingServer.settingModel.IsReset)
                         {
@@ -229,7 +229,7 @@ namespace ToolCollisionCalibration.ViewModels
             //检查气缸是否缩回到位
             if (inputStatus[18] == 0)
             {
-                Log.Write("销钉气缸未缩回到位，请检查气缸缩回到位信号是否亮起。", LogType.错误);
+                Log.Write("销钉气缸未缩回到位，请检查气缸缩回到位信号是否亮起。", LogType.提示);
                 return;
             }
 
@@ -312,6 +312,13 @@ namespace ToolCollisionCalibration.ViewModels
             deviceValueModel = new DeviceValueModel();
             //OK灯复位NG灯复位  测试灯运行
             motionCard.ZAux_Direct_SetOutMulti(7, 8, [0, 0]);
+            //检测螺丝机是否有螺丝
+            if (inputStatus[20] == 0)
+            {
+                Log.Write("未检测到螺丝机有螺丝信号。", LogType.提示);
+                return false;
+            }
+
             if (!await AxisMoveToInitialPosition()) return false;
             //扫码
             while (settingModel.localparams.ScanEnable)
@@ -319,7 +326,7 @@ namespace ToolCollisionCalibration.ViewModels
                 var ScanResult = await Scanner.ReadBarcodeAsync(100);
                 if (!ScanResult.IsSuccess || !ScanResult.Result[0].Contains("m="))
                 {
-                    Log.Write(ScanResult.ErrMessage + "  未扫上二维码，重试中...", LogType.错误);
+                    Log.Write(ScanResult.ErrMessage + "  未扫上二维码，重试中...", LogType.提示);
                     await Task.Delay(3000, cts.Token);
                     continue;
                 }
@@ -396,13 +403,14 @@ namespace ToolCollisionCalibration.ViewModels
                 {
                     deviceValueModel.RealAngle = angleresult.Result[0];
                 }
-                AddPointFromInput(deviceValueModel.RealAngle, deviceValueModel.RealTorque);
+                
                 if (deviceValueModel.RealTorque >= dBParams.StartingTorque && !StartingAngleIsSuccess)
                 {
                     dataBaseModel.StartingAngle = deviceValueModel.RealAngle.ToString();
                     StartingAngleIsSuccess = true;
                 }
-                if(deviceValueModel.RealTorque >= dBParams.EndTorque)
+                if(StartingAngleIsSuccess) AddPointFromInput(deviceValueModel.RealAngle, deviceValueModel.RealTorque);
+                if (deviceValueModel.RealTorque >= dBParams.EndTorque)
                 {
                     dataBaseModel.EndAngle = deviceValueModel.RealAngle.ToString();
                     //旋转轴立即停止
@@ -516,7 +524,7 @@ namespace ToolCollisionCalibration.ViewModels
                 catch (OperationCanceledException)
                 {
                     _IsettingServer.settingModel.IsReset = false;
-                    Log.Write("人工强制停止运行!",LogType.提示);
+                    Log.Write("人工强制停止运行!",LogType.错误);
                 }
                 catch (Exception ex)
                 {

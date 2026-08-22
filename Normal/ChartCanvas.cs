@@ -262,8 +262,6 @@ namespace ToolCollisionCalibration.Normal
             var axisBrush  = new SolidColorBrush(Color.FromRgb(0x33, 0x33, 0x33));
             var labelBrush = new SolidColorBrush(Color.FromRgb(0x55, 0x55, 0x55));
             var lineBrush  = new SolidColorBrush(Color.FromRgb(0x1E, 0x88, 0xE5));
-            var pointBrush = new SolidColorBrush(Color.FromRgb(0xE5, 0x39, 0x35));
-            var outline    = Brushes.White;
 
             // ---- 竖直网格线 + X 刻度标签 ----
             // Math.Ceiling(XMin/xStep)*xStep 找到 >= XMin 的最小 xStep 倍数刻度起点
@@ -397,39 +395,7 @@ namespace ToolCollisionCalibration.Normal
                 }
             }
 
-            // ---- 点（红色圆点 + 白描边 + 最后一个点带坐标标签） ----
-            if (pts != null)
-            {
-                for (int i = 0; i < pts.Count; i++)
-                {
-                    var p = pts[i];
-                    double cx = mapX(p.X), cy = mapY(p.Y);
-                    var el = new Ellipse
-                    {
-                        Width = 9, Height = 9,
-                        Fill = pointBrush, Stroke = outline, StrokeThickness = 1.5
-                    };
-                    // Ellipse 左上定位；偏移 Width/Height / 2 保证点中心精准对齐坐标
-                    SetLeft(el, cx - 4.5);
-                    SetTop(el, cy - 4.5);
-                    Children.Add(el);
-
-                    // 最后一个点显示 (x, y)
-                    if (i == pts.Count - 1)
-                    {
-                        var tb = MakeLabel($"({p.X.ToString(xFmt)}, {p.Y.ToString(yFmt)})", pointBrush);
-                        double lx = cx + 10;
-                        double ly = cy - tb.DesiredSize.Height - 4;
-                        // 若贴右边界 → 标签改到点左侧；若贴上边界 → 改到点下方
-                        if (lx + tb.DesiredSize.Width > MarginLeft + plotW)
-                            lx = cx - tb.DesiredSize.Width - 10;
-                        if (ly < MarginTop) ly = cy + 10;
-                        SetLeft(tb, lx);
-                        SetTop(tb, ly);
-                        Children.Add(tb);
-                    }
-                }
-            }
+            // ---- 不再绘制单独的点，只保留连线 ----
         }
 
         // ============================================================
