@@ -30,8 +30,8 @@
                            XMax="{Binding XMax, Mode=OneWay}"
                            YMin="{Binding YMin, Mode=OneWay}"
                            YMax="{Binding YMax, Mode=OneWay}"
-                           XAxisTitle="扭矩"
-                           YAxisTitle="角度"
+                           XAxisTitle="角度"
+                           YAxisTitle="扭矩"
                            Background="White"
                            Margin="10,6,10,6"/>
                     <StackPanel Orientation="Vertical" Grid.Column="1">

@@ -433,6 +433,11 @@ namespace ToolCollisionCalibration.ViewModels
             //根据反转角度计算需要反转到的角度
             float.TryParse(dataBaseModel.EndAngle, out float EndAngle);
             dataBaseModel.InvertPositon = Math.Round(EndAngle - dBParams.InvertAngleCompensation,2);
+
+            //角度传感器角度清零
+            angleDevice.ResetZero();
+            //记录结束角度方便计算
+            float.TryParse(dataBaseModel.EndAngle,out float GetEndAngle);
             //旋转轴反向旋转
             motionCard.Vmove(3, -1);
             //判断是否到达设定的反转角度
@@ -441,7 +446,7 @@ namespace ToolCollisionCalibration.ViewModels
                 var angleresult = await angleDevice.ReadAngle(50, settingModel.localparams.AngleCoefficient);
                 if (angleresult.IsSuccess)
                 {
-                    deviceValueModel.RealAngle = angleresult.Result[0];
+                    deviceValueModel.RealAngle = Math.Round(GetEndAngle - 360 + angleresult.Result[0],1);
                     if(deviceValueModel.RealAngle <= dataBaseModel.InvertPositon)
                     {
                         //到达后旋转位置立即停止
@@ -568,7 +573,7 @@ namespace ToolCollisionCalibration.ViewModels
         /// X 轴范围最大值，超过当前值会被 NiceCeiling 扩展到易读刻度（1/2/5 系列），
         /// 只增不减：避免点缩小范围引起视图端反复重排（经验 151077：抖动问题的根源之一是缩小边界）。
         /// </summary>
-        public double XMax { get; private set; } = 15;
+        public double XMax { get; private set; } = 160;
 
         /// <summary>Y 轴范围最小值（当前固定为 0）。</summary>
         public double YMin { get; private set; } = 0;
