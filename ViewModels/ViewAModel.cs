@@ -361,8 +361,6 @@ namespace ToolCollisionCalibration.ViewModels
             dataBaseModel.InvertAngleCompensation = dBParams.InvertAngleCompensation.ToString();
             //旋转轴开始旋转
             motionCard.Vmove(3, 1);
-            //angleDevice.SetDirection(false);
-            //await Task.Delay(50,cts.Token);
             
             return true;
         }

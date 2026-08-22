@@ -85,6 +85,25 @@
                     </StackPanel>
 
                 </Grid>
+                <TextBlock Grid.Row="2" Text="{Binding TestResult}" TextAlignment="Center">
+                    <TextBlock.Style>
+                        <Style TargetType="TextBlock">
+                            <Setter Property="FontSize" Value="40"/>
+                            <Style.Triggers>
+                                <Trigger Property="Text" Value="运行中">
+                                    <Setter Property="Background" Value="Yellow"/>
+                                </Trigger>
+                                <Trigger Property="Text" Value="PASS">
+                                    <Setter Property="Background" Value="Green"/>
+                                </Trigger>
+                                <Trigger Property="Text" Value="NG">
+                                    <Setter Property="Background" Value="Red"/>
+                                </Trigger>
+                            </Style.Triggers>
+                        </Style>
+                    </TextBlock.Style>
+                </TextBlock>
+
                 <DataGrid Grid.Row="3" x:Name="LogDataGrid" IsReadOnly="True" AutoGenerateColumns="False" CanUserAddRows="False" CanUserSortColumns="False" FontSize="15">
                     <DataGrid.Columns>
                         <DataGridTextColumn Header="时间" Binding="{Binding Time}"/>
