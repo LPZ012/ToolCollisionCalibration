@@ -77,7 +77,7 @@ namespace ToolCollisionCalibration.ViewModels
         private async void ServoReset(object IoNum)
         {
             int ionum = Convert.ToInt32(IoNum);
-            await motionCard.Reset(ionum);
+            await motionCard.AxisAlarmReset(ionum);
         }
 
         /// <summary>

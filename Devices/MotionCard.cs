@@ -24,10 +24,15 @@ namespace ToolCollisionCalibration.Devices
             SetAxisLimitIn(2, 10, 8, 9);
         }
 
-        public async Task Reset(int ionum)
+        /// <summary>
+        /// 轴报警复位
+        /// </summary>
+        /// <param name="ionum">轴复位点位</param>
+        /// <returns></returns>
+        public async Task AxisAlarmReset(int ionum)
         {
             ZAux_Direct_SetOp(ionum, 0);
-            await Task.Delay(500);
+            await Task.Delay(100);
             ZAux_Direct_SetOp(ionum, 1);
         }
 

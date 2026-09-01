@@ -211,8 +211,7 @@ namespace ToolCollisionCalibration.ViewModels
         private async Task ResetMachine(bool ManualAuto)
         {
             _IsettingServer.settingModel.IsReset = false;
-            //轴上使能
-            motionCard.ZAux_Direct_SetOp(10, 1);
+            
             //所有轴立即停止
             motionCard.ZAux_Direct_CancelAxisList(4, [0, 1, 2, 3], 2);
 
@@ -235,10 +234,10 @@ namespace ToolCollisionCalibration.ViewModels
 
             if (!ManualAuto)   
             {
-                //是否需要断轴使能?
-
+                //轴上使能
+                motionCard.ZAux_Direct_SetOp(10, 1);
                 //轴报警复位
-                await motionCard.Reset(11);
+                await motionCard.AxisAlarmReset(11);
                 //灯复位
                 motionCard.ZAux_Direct_SetOutMulti(7, 8, [0, 0]);
 
