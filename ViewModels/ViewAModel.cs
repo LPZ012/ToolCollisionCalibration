@@ -146,16 +146,16 @@ namespace ToolCollisionCalibration.ViewModels
                 ///判断上升沿启动
                 if (inputStatus[12] == '1' && ListOldSinal[12] == '0' && inputStatus[11] == '1' && ListOldSinal[11] == '0'&& NoErr && !_IsettingServer.settingModel.IsRunning && !IsResetting)
                 {
-                    if (inputStatus[16] != '1')
-                    {
-                        Log.Write("左固定气缸未缩回到位，请检查气缸缩回到位信号是否亮起。", LogType.提示);
-                        NoErr = false;
-                    }
-                    if (inputStatus[17] != '1')
-                    {
-                        Log.Write("右固定气缸未缩回到位，请检查气缸缩回到位信号是否亮起。", LogType.提示);
-                        NoErr = false;
-                    }
+                    //if (inputStatus[16] != '1')
+                    //{
+                    //    Log.Write("左固定气缸未缩回到位，请检查气缸缩回到位信号是否亮起。", LogType.提示);
+                    //    NoErr = false;
+                    //}
+                    //if (inputStatus[17] != '1')
+                    //{
+                    //    Log.Write("右固定气缸未缩回到位，请检查气缸缩回到位信号是否亮起。", LogType.提示);
+                    //    NoErr = false;
+                    //}
                     if (inputStatus[18] != '1')
                     {
                         Log.Write("销钉气缸未缩回到位，请检查气缸缩回到位信号是否亮起。", LogType.提示);
@@ -217,7 +217,7 @@ namespace ToolCollisionCalibration.ViewModels
 
             
 
-            //所有气缸缩回(除两个固定气缸除外)
+            //所有气缸缩回(除两个固定和气缸除外)
             motionCard.ZAux_Direct_SetOutMulti(0, 1, [0, 0]);
             motionCard.ZAux_Direct_SetOutMulti(4, 6, [0,0,0]);
             //真空阀供气停止
@@ -360,7 +360,13 @@ namespace ToolCollisionCalibration.ViewModels
             dataBaseModel.InvertAngleCompensation = dBParams.InvertAngleCompensation.ToString();
             //旋转轴开始旋转
             motionCard.Vmove(3, 1);
-            
+            //取销钉
+            motionCard.ZAux_Direct_SetOp(1, 1);
+            await Task.Delay(1000, cts.Token);
+            motionCard.ZAux_Direct_SetOp(9, 1);
+            await Task.Delay(1000, cts.Token);
+            motionCard.ZAux_Direct_SetOp(1, 0);
+            await Task.Delay(1000, cts.Token);
             return true;
         }
 
@@ -383,7 +389,7 @@ namespace ToolCollisionCalibration.ViewModels
             motionCard.ZAux_Direct_SetOp(0, 1);
 
             //等待气缸动作完成
-            await Task.Delay(2000,cts.Token);
+            await Task.Delay(1000,cts.Token);
             angleDevice.ResetZero();
             torqueDevice.ResetZero();
             //标志位
@@ -426,13 +432,14 @@ namespace ToolCollisionCalibration.ViewModels
             ////延时
             //await Task.Delay(1000, cts.Token);
 
+            //角度传感器角度清零
+            angleDevice.ResetZero();
             await Task.Delay(1000, cts.Token);
             //根据反转角度计算需要反转到的角度
             float.TryParse(dataBaseModel.EndAngle, out float EndAngle);
             dataBaseModel.InvertPositon = Math.Round(EndAngle - dBParams.InvertAngleCompensation,2);
 
-            //角度传感器角度清零
-            angleDevice.ResetZero();
+            
             //记录结束角度方便计算
             float.TryParse(dataBaseModel.EndAngle,out float GetEndAngle);
             //旋转轴反向旋转
@@ -453,15 +460,17 @@ namespace ToolCollisionCalibration.ViewModels
                 }
                 await Task.Delay (10,cts.Token);
             }
-
+            //定位气缸复位
+            motionCard.ZAux_Direct_SetOp(0, 0);
+            motionCard.ZAux_Direct_SetOp(6, 0);
             //开始进行打销钉步骤
-            //取销钉
-            motionCard.ZAux_Direct_SetOp(1, 1);
-            await Task.Delay(2000,cts.Token);
-            motionCard.ZAux_Direct_SetOp(9, 1);
-            await Task.Delay(2000, cts.Token);
-            motionCard.ZAux_Direct_SetOp(1, 0);
-            await Task.Delay(2000, cts.Token);
+            ////取销钉
+            //motionCard.ZAux_Direct_SetOp(1, 1);
+            //await Task.Delay(2000,cts.Token);
+            //motionCard.ZAux_Direct_SetOp(9, 1);
+            //await Task.Delay(2000, cts.Token);
+            //motionCard.ZAux_Direct_SetOp(1, 0);
+            //await Task.Delay(2000, cts.Token);
             
 
             //销钉轴移动到工作位置
@@ -473,9 +482,10 @@ namespace ToolCollisionCalibration.ViewModels
             }
             //移动到指定位置之后开始打销钉
             motionCard.ZAux_Direct_SetOp(1, 1);
-            await Task.Delay(2000, cts.Token);
+            await Task.Delay(1000, cts.Token);
             motionCard.ZAux_Direct_SetOp(9, 0);
-            await Task.Delay(2000, cts.Token);
+            await Task.Delay(1000, cts.Token);
+            dataBaseModel.TestResult = true;
         }
 
         /// <summary>
@@ -486,6 +496,15 @@ namespace ToolCollisionCalibration.ViewModels
 
             try
             {
+                await ResetMachine(true);
+            }
+            catch (Exception ex)
+            {
+                dataBaseModel.TestResult = false;
+                Log.Write("结束初始化发生错误。", LogType.错误);
+            }
+            finally
+            {
                 if (dataBaseModel.TestResult)  //测试合格
                 {
                     TestResult = "PASS";
@@ -494,14 +513,6 @@ namespace ToolCollisionCalibration.ViewModels
                 {
                     TestResult = "NG";
                 }
-                await ResetMachine(true);
-            }
-            catch (Exception ex)
-            {
-                Log.Write("结束初始化发生错误。", LogType.错误);
-            }
-            finally
-            {
                 _IsettingServer.settingModel.IsRunning = false;
             }
         }

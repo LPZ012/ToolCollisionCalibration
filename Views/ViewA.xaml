@@ -14,8 +14,8 @@
                 <Grid.RowDefinitions>
                     <RowDefinition Height="Auto"/>
                     <RowDefinition Height="*"/>
-                    <RowDefinition Height="100"/>
-                    <RowDefinition Height="200"/>
+                    <RowDefinition Height="50"/>
+                    <RowDefinition Height="250"/>
                 </Grid.RowDefinitions>
                 <Label Content="角度与扭矩笛卡尔坐标" HorizontalAlignment="Center"/>
                 <Grid Grid.Row="1">
