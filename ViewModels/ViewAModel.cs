@@ -421,20 +421,24 @@ namespace ToolCollisionCalibration.ViewModels
                 }
                 await Task.Delay(10,cts.Token);
             }
-
-            ////开始打阻值，垂直和倾斜气缸同时伸出
-            //motionCard.ZAux_Direct_SetOutMulti(4, 5, [1, 1]);
-            ////延时
-            //await Task.Delay(1000,cts.Token);
-            ////判断(没写)
-            ////垂直和倾斜气缸同时缩回
-            //motionCard.ZAux_Direct_SetOutMulti(4, 5, [0, 0]);
-            ////延时
-            //await Task.Delay(1000, cts.Token);
-
             //角度传感器角度清零
             angleDevice.ResetZero();
+            //开始打阻值，垂直和倾斜气缸同时伸出
+            motionCard.ZAux_Direct_SetOutMulti(4, 5, [1, 1]);
+            //延时
             await Task.Delay(1000, cts.Token);
+            //判断
+            if (inputStatus[14] != '1')
+            {
+                Log.Write("没有撞刀。", LogType.提示);
+                return;
+            }
+            //垂直和倾斜气缸同时缩回
+            motionCard.ZAux_Direct_SetOutMulti(4, 5, [0, 0]);
+            //延时
+            await Task.Delay(1000, cts.Token);
+
+
             //根据反转角度计算需要反转到的角度
             float.TryParse(dataBaseModel.EndAngle, out float EndAngle);
             dataBaseModel.InvertPositon = Math.Round(EndAngle - dBParams.InvertAngleCompensation,2);
