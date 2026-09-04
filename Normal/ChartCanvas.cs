@@ -121,6 +121,31 @@ namespace ToolCollisionCalibration.Normal
             DependencyProperty.Register(nameof(YAxisTitle), typeof(string), typeof(ChartCanvas),
                 new PropertyMetadata("Y", OnRangeChanged));
 
+        /// <summary>
+        /// 竖直标志线的 X 数据坐标（double.NaN 表示不显示）。
+        /// 用于在图表上标记某个特定角度位置的起始点，由 ViewModel 绑定传入。
+        /// </summary>
+        public double VerticalMarkerX
+        {
+            get => (double)GetValue(VerticalMarkerXProperty);
+            set => SetValue(VerticalMarkerXProperty, value);
+        }
+        public static readonly DependencyProperty VerticalMarkerXProperty =
+            DependencyProperty.Register(nameof(VerticalMarkerX), typeof(double), typeof(ChartCanvas),
+                new PropertyMetadata(double.NaN, OnRangeChanged));
+
+        /// <summary>
+        /// 结束角度竖直标志线的 X 数据坐标（double.NaN 表示不显示）。
+        /// </summary>
+        public double VerticalMarkerEndX
+        {
+            get => (double)GetValue(VerticalMarkerEndXProperty);
+            set => SetValue(VerticalMarkerEndXProperty, value);
+        }
+        public static readonly DependencyProperty VerticalMarkerEndXProperty =
+            DependencyProperty.Register(nameof(VerticalMarkerEndX), typeof(double), typeof(ChartCanvas),
+                new PropertyMetadata(double.NaN, OnRangeChanged));
+
         // ---- 集合变更事件钩子：避免多次 GC 事件委托或被解绑
         //
         // 当 {Binding Points} 重新赋值一个新集合实例时，旧集合的事件必须 -=，否则
@@ -393,6 +418,48 @@ namespace ToolCollisionCalibration.Normal
                         Stroke = lineBrush, StrokeThickness = 2
                     });
                 }
+            }
+
+            // ---- 竖直标志线 ----
+            // 当 VerticalMarkerX 不是 NaN 且在 [XMin, XMax] 范围内时，画一条虚线标志
+            double markerX = VerticalMarkerX;
+            if (!double.IsNaN(markerX) && markerX >= XMin - 1e-9 && markerX <= XMax + 1e-9)
+            {
+                double mx = mapX(markerX);
+                var markerBrush = new SolidColorBrush(Color.FromRgb(0xE5, 0x39, 0x35)); // Material Red 600，醒目
+                var markerLine = new Line
+                {
+                    X1 = mx, Y1 = MarginTop,
+                    X2 = mx, Y2 = MarginTop + plotH,
+                    Stroke = markerBrush, StrokeThickness = 2,
+                    StrokeDashArray = new DoubleCollection { 6, 3 } // 虚线样式
+                };
+                Children.Add(markerLine);
+
+                // 标志线顶部标签
+                var markerLabel = MakeLabel("起始角度", markerBrush);
+                SetLeft(markerLabel, mx - markerLabel.DesiredSize.Width / 2);
+                SetTop(markerLabel, MarginTop + 2);
+                Children.Add(markerLabel);
+            }
+
+            // ---- 结束角度竖直标志线 ----
+            double markerEndX = VerticalMarkerEndX;
+            if (!double.IsNaN(markerEndX) && markerEndX >= XMin - 1e-9 && markerEndX <= XMax + 1e-9)
+            {
+                double mx = mapX(markerEndX);
+                var endBrush = new SolidColorBrush(Color.FromRgb(0xF5, 0x7C, 0x00)); // Material Orange 700，与起始线（红）区分
+                Children.Add(new Line
+                {
+                    X1 = mx, Y1 = MarginTop,
+                    X2 = mx, Y2 = MarginTop + plotH,
+                    Stroke = endBrush, StrokeThickness = 2,
+                    StrokeDashArray = new DoubleCollection { 2, 4 } // 点划线，与起始线虚线样式区分
+                });
+                var endLabel = MakeLabel("结束角度", endBrush);
+                SetLeft(endLabel, mx - endLabel.DesiredSize.Width / 2);
+                SetTop(endLabel, MarginTop + 2);
+                Children.Add(endLabel);
             }
 
             // ---- 不再绘制单独的点，只保留连线 ----

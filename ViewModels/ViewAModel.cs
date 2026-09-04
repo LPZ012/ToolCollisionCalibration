@@ -410,6 +410,7 @@ namespace ToolCollisionCalibration.ViewModels
                 if (deviceValueModel.RealTorque >= dBParams.StartingTorque && !StartingAngleIsSuccess)
                 {
                     dataBaseModel.StartingAngle = deviceValueModel.RealAngle.ToString();
+                    StartingAngleMarkX = deviceValueModel.RealAngle; // 在当前角度位置画竖直标志线
                     StartingAngleIsSuccess = true;
                 }
                 //if(StartingAngleIsSuccess) AddPointFromInput(deviceValueModel.RealAngle, deviceValueModel.RealTorque);
@@ -417,6 +418,7 @@ namespace ToolCollisionCalibration.ViewModels
                 if (deviceValueModel.RealTorque >= dBParams.EndTorque)
                 {
                     dataBaseModel.EndAngle = deviceValueModel.RealAngle.ToString();
+                    EndingAngleMarkX = deviceValueModel.RealAngle; // 在当前角度位置画竖直标志线
                 }
                 if(deviceValueModel.RealAngle >= settingModel.localparams.MaxAngle)
                 {
@@ -464,6 +466,11 @@ namespace ToolCollisionCalibration.ViewModels
             //判断是否到达设定的反转角度
             while(true)
             {
+                var torqueresult = await torqueDevice.ReadTorque(50, settingModel.localparams.TorqueCoefficient);
+                if (torqueresult.IsSuccess)
+                {
+                    deviceValueModel.RealTorque = torqueresult.Result[0];
+                }
                 var angleresult = await angleDevice.ReadAngle(50, settingModel.localparams.AngleCoefficient);
                 if (angleresult.IsSuccess)
                 {
@@ -598,6 +605,22 @@ namespace ToolCollisionCalibration.ViewModels
 
         /// <summary>Y 轴范围最大值，同 XMax 的扩展逻辑。</summary>
         public double YMax { get; private set; } = 5;
+
+
+        /// <summary>
+        /// 起始角度标志线的 X 数据坐标。
+        /// double.NaN 表示不显示标志线（默认值，清除坐标时也重置为此值）。
+        /// 绑定到 ChartCanvas.VerticalMarkerX。
+        /// </summary>
+        public double StartingAngleMarkX { get; set; } = double.NaN;
+
+        /// <summary>
+        /// 结束角度标志线的 X 数据坐标。
+        /// double.NaN 表示不显示标志线（默认值，清除坐标时也重置为此值）。
+        /// 绑定到 ChartCanvas.VerticalMarkerEndX。
+        /// </summary>
+        public double EndingAngleMarkX { get; set; } = double.NaN;
+
         public string XInput { get; set; }
 
         /// <summary>Y 输入框文本。</summary>
@@ -643,6 +666,8 @@ namespace ToolCollisionCalibration.ViewModels
             Points.Clear();
             XMin = 0; XMax = 150;
             YMin = 0; YMax = 5;
+            StartingAngleMarkX = double.NaN; // 清除标志线
+            EndingAngleMarkX = double.NaN;   // 清除结束标志线
             // 点数归零后重新拼 Status
             UpdateStatus();
         }
