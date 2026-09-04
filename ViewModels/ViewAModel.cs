@@ -417,7 +417,6 @@ namespace ToolCollisionCalibration.ViewModels
                 if (deviceValueModel.RealTorque >= dBParams.EndTorque)
                 {
                     dataBaseModel.EndAngle = deviceValueModel.RealAngle.ToString();
-                    //旋转轴立即停止
                 }
                 if(deviceValueModel.RealAngle >= settingModel.localparams.MaxAngle)
                 {
@@ -426,7 +425,13 @@ namespace ToolCollisionCalibration.ViewModels
                 }
                 await Task.Delay(10,cts.Token);
             }
+            //旋转轴立即停止
             motionCard.AxisStop(3);
+            //计算角度差
+            dataBaseModel.AngleDifference = Math.Round(float.Parse(dataBaseModel.EndAngle) - float.Parse(dataBaseModel.StartingAngle), 1).ToString();
+            //计算扭矩差
+            dataBaseModel.TorqueDifference = Math.Round(float.Parse(dataBaseModel.EndTorque) - float.Parse(dataBaseModel.StartingTorque), 1).ToString();
+            
             //角度传感器角度清零
             //angleDevice.ResetZero();
             //开始打阻值，垂直和倾斜气缸同时伸出
@@ -478,16 +483,6 @@ namespace ToolCollisionCalibration.ViewModels
             //定位气缸复位
             motionCard.ZAux_Direct_SetOp(0, 0);
             motionCard.ZAux_Direct_SetOp(6, 0);
-            //开始进行打销钉步骤
-            ////取销钉
-            //motionCard.ZAux_Direct_SetOp(1, 1);
-            //await Task.Delay(2000,cts.Token);
-            //motionCard.ZAux_Direct_SetOp(9, 1);
-            //await Task.Delay(2000, cts.Token);
-            //motionCard.ZAux_Direct_SetOp(1, 0);
-            //await Task.Delay(2000, cts.Token);
-            
-
             //销钉轴移动到工作位置
             var Moveresult = await motionCard.MoveAbs_DoneStatus(1, settingModel.localparams.PinAxis_WorkPosition, 50);
             if (!Moveresult.IsSuccess)
