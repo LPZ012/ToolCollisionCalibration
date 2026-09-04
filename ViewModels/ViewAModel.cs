@@ -412,19 +412,27 @@ namespace ToolCollisionCalibration.ViewModels
                     dataBaseModel.StartingAngle = deviceValueModel.RealAngle.ToString();
                     StartingAngleIsSuccess = true;
                 }
-                if(StartingAngleIsSuccess) AddPointFromInput(deviceValueModel.RealAngle, deviceValueModel.RealTorque);
+                //if(StartingAngleIsSuccess) AddPointFromInput(deviceValueModel.RealAngle, deviceValueModel.RealTorque);
+                AddPointFromInput(deviceValueModel.RealAngle, deviceValueModel.RealTorque);
                 if (deviceValueModel.RealTorque >= dBParams.EndTorque)
                 {
                     dataBaseModel.EndAngle = deviceValueModel.RealAngle.ToString();
                     //旋转轴立即停止
-                    motionCard.AxisStop(3);
+                }
+                if(deviceValueModel.RealAngle >= settingModel.localparams.MaxAngle)
+                {
+                    Log.Write("超出最大角度限制。", LogType.提示);
+                    return;
                 }
                 await Task.Delay(10,cts.Token);
             }
+            motionCard.AxisStop(3);
             //角度传感器角度清零
-            angleDevice.ResetZero();
+            //angleDevice.ResetZero();
             //开始打阻值，垂直和倾斜气缸同时伸出
-            motionCard.ZAux_Direct_SetOutMulti(4, 5, [1, 1]);
+            //motionCard.ZAux_Direct_SetOutMulti(4, 5, [1, 1]);
+            motionCard.ZAux_Direct_SetOp(4, 1);
+            motionCard.ZAux_Direct_SetOp(5, 1);
             //延时
             await Task.Delay(1000, cts.Token);
             //判断
@@ -454,8 +462,11 @@ namespace ToolCollisionCalibration.ViewModels
                 var angleresult = await angleDevice.ReadAngle(50, settingModel.localparams.AngleCoefficient);
                 if (angleresult.IsSuccess)
                 {
-                    deviceValueModel.RealAngle = Math.Round(GetEndAngle - 360 + angleresult.Result[0],1);
-                    if(deviceValueModel.RealAngle <= dataBaseModel.InvertPositon)
+                    //deviceValueModel.RealAngle = Math.Round(GetEndAngle - 360 + angleresult.Result[0], 1);
+                    if(angleresult.Result[0] > settingModel.localparams.MaxAngle) deviceValueModel.RealAngle = Math.Round(angleresult.Result[0] - 360,1);
+                    else deviceValueModel.RealAngle = angleresult.Result[0];
+
+                    if (deviceValueModel.RealAngle <= dataBaseModel.InvertPositon)
                     {
                         //到达后旋转位置立即停止
                         motionCard.AxisStop(3);

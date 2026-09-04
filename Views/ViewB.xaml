@@ -118,6 +118,7 @@
                         <TextBlock Text="起始扭矩" FontSize="16"/>
                         <TextBlock Text="结束扭矩" FontSize="16" Margin="0,6"/>
                         <TextBlock Text="反转角度" FontSize="16"/>
+                        <TextBlock Text="最大角度" FontSize="16" Margin="0,6"/>
                         <!--<TextBlock Text="角度上限" FontSize="16" Margin="0,6"/>
                         <TextBlock Text="角度下限" FontSize="16"/>
                         <TextBlock Text="反转角度" FontSize="16" Margin="0,6"/>-->
@@ -126,6 +127,8 @@
                         <TextBox Text="{Binding _IsettingServer.settingModel.DBParams.StartingTorque}" Width="230"  TextAlignment="Center" FontSize="15"/>
                         <TextBox Text="{Binding _IsettingServer.settingModel.DBParams.EndTorque}" Width="230"  TextAlignment="Center" FontSize="15" Margin="0,5"/>
                         <TextBox Text="{Binding _IsettingServer.settingModel.DBParams.InvertAngleCompensation}" Width="230"  TextAlignment="Center" FontSize="15"/>
+                        <TextBox Text="{Binding _IsettingServer.settingModel.localparams.MaxAngle}" Width="230"  TextAlignment="Center" FontSize="15" Margin="0,6"/>
+
                         <!--<TextBox Text="{Binding _IsettingServer.settingModel.DBParams.OrderNum}" Width="230"  TextAlignment="Center" FontSize="15" Margin="0,6"/>
                         <TextBox Text="{Binding _IsettingServer.settingModel.DBParams.ProductModel}" Width="230"  TextAlignment="Center" FontSize="15"/>
                         <TextBox Text="{Binding _IsettingServer.settingModel.DBParams.OrderNum}" Width="230"  TextAlignment="Center" FontSize="15" Margin="0,6"/>-->

@@ -48,7 +48,10 @@ namespace ToolCollisionCalibration.Models
         /// 扭矩系数
         /// </summary>
         public float TorqueCoefficient { get; set; } = 1;
-
+        /// <summary>
+        /// 设定最大角度
+        /// </summary>
+        public float MaxAngle { get; set; }
         public SerialPortModel ScannerModel { get; set; }
         public SerialPortModel TorqueModel { get; set; }
         public SerialPortModel AngleModel { get; set; }
