@@ -136,6 +136,9 @@ namespace ToolCollisionCalibration.ViewModels
                 {
                     //轴运动立即停止
                     motionCard.ZAux_Direct_CancelAxisList(4, [0, 1, 2, 3], 2);
+                    //轴断使能?
+                    motionCard.ZAux_Direct_SetOp(10, 0);
+
                     cts.Cancel();
                 }
                 //没有运行时才可以进行手动复位
@@ -146,16 +149,6 @@ namespace ToolCollisionCalibration.ViewModels
                 ///判断上升沿启动
                 if (inputStatus[12] == '1' && ListOldSinal[12] == '0' && inputStatus[11] == '1' && ListOldSinal[11] == '0'&& NoErr && !_IsettingServer.settingModel.IsRunning && !IsResetting)
                 {
-                    //if (inputStatus[16] != '1')
-                    //{
-                    //    Log.Write("左固定气缸未缩回到位，请检查气缸缩回到位信号是否亮起。", LogType.提示);
-                    //    NoErr = false;
-                    //}
-                    //if (inputStatus[17] != '1')
-                    //{
-                    //    Log.Write("右固定气缸未缩回到位，请检查气缸缩回到位信号是否亮起。", LogType.提示);
-                    //    NoErr = false;
-                    //}
                     if (inputStatus[18] != '1')
                     {
                         Log.Write("销钉气缸未缩回到位，请检查气缸缩回到位信号是否亮起。", LogType.提示);
@@ -211,7 +204,8 @@ namespace ToolCollisionCalibration.ViewModels
         private async Task ResetMachine(bool ManualAuto)
         {
             _IsettingServer.settingModel.IsReset = false;
-            
+            //轴上使能
+            motionCard.ZAux_Direct_SetOp(10, 1);
             //所有轴立即停止
             motionCard.ZAux_Direct_CancelAxisList(4, [0, 1, 2, 3], 2);
 
@@ -234,8 +228,7 @@ namespace ToolCollisionCalibration.ViewModels
 
             if (!ManualAuto)   
             {
-                //轴上使能
-                motionCard.ZAux_Direct_SetOp(10, 1);
+                
                 //轴报警复位
                 await motionCard.AxisAlarmReset(11);
                 //灯复位
