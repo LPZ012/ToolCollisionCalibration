@@ -501,30 +501,17 @@ namespace ToolCollisionCalibration.ViewModels
         /// <summary>
         /// 测试结束初始化
         /// </summary>
-        private async Task EndInits()
+        private void EndInits()
         {
-
-            try
+            if (dataBaseModel.TestResult)  //测试合格
             {
-                await ResetMachine(true);
+                TestResult = "PASS";
             }
-            catch (Exception ex)
+            else
             {
-                dataBaseModel.TestResult = false;
-                Log.Write("结束初始化发生错误。", LogType.错误);
+                TestResult = "NG";
             }
-            finally
-            {
-                if (dataBaseModel.TestResult)  //测试合格
-                {
-                    TestResult = "PASS";
-                }
-                else
-                {
-                    TestResult = "NG";
-                }
-                _IsettingServer.settingModel.IsRunning = false;
-            }
+            _IsettingServer.settingModel.IsRunning = false;
         }
         protected void OnPropertyChanged(string propertyName)
         {
@@ -542,7 +529,11 @@ namespace ToolCollisionCalibration.ViewModels
             {
                 try
                 {
-                    if(await StartInit()) await Run();
+                    if (await StartInit())
+                    {
+                        await Run();
+                        await ResetMachine(true);
+                    }
                 }
                 catch (OperationCanceledException)
                 {
@@ -556,7 +547,7 @@ namespace ToolCollisionCalibration.ViewModels
                 }
                 finally
                 {
-                    await EndInits();
+                    EndInits();
                 }
             });
 
